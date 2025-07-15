@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def generate_mandelbrot():
-    # Function to generate the Mandelbrot set and display it
+    # Function to generate the Mandelbrot set and display it 
 
     # Variable assignment
     real_min = -1.0
