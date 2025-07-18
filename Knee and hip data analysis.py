@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 def display_stats(stat, category):
     if category in ["Age", "BMI"]:
@@ -145,14 +146,21 @@ def plot_scan_outcomes(df, columns):
     plt.show()
 
 def plot_demographics(df):
-    plt.figure(2)
-    plt.scatter(x=df["Age"], y=df["BMI"])
+    fig2, ax2 = plt.subplots()
+    ax2.scatter(x=df["Age"], y=df["BMI"])
     plt.xlabel("Age")
     plt.ylabel("BMI")
+    plt.title("Variance of BMI with Age")
+    mask = ~np.isnan(df["Age"]) & ~np.isnan(df["BMI"])
+    x = df["Age"][mask]
+    y = df["BMI"][mask]
+    r, p = stats.pearsonr(x=x, y=y)
+    plt.text(.01, .95, "Correlation Coefficient = {:.2f}".format(r), transform=ax2.transAxes)
     plt.show()
 
     plt.figure(3)
     sns.boxplot(data=df, x="Gender", y="BMI")
+    plt.title("Comparison of BMI spread with Gender")
     plt.show()
 
 
