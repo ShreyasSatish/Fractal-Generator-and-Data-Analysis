@@ -139,9 +139,23 @@ def plot_scan_outcomes(df, columns):
     # Hide any unused subplots
     for j in range(i + 1, len(axes)):
         fig.delaxes(axes[j])
-        
+
+    plt.figure(1)    
     plt.tight_layout(pad=3.0) # Add padding between plots
     plt.show()
+
+def plot_demographics(df):
+    plt.figure(2)
+    plt.scatter(x=df["Age"], y=df["BMI"])
+    plt.xlabel("Age")
+    plt.ylabel("BMI")
+    plt.show()
+
+    plt.figure(3)
+    sns.boxplot(data=df, x="Gender", y="BMI")
+    plt.show()
+
+
 
 def main():
     data = pd.read_csv("C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv")
@@ -150,14 +164,18 @@ def main():
     # Making a seperate table for objective information
     objective_data = data[["id", "Initials", "Age", "Gender", "BMI", "Date of prosthesis insertion", "Date of symptom onset", "Date of scan", 
                            "Result of bone scan", "Ortho Decision", "Comorbidities", "FOV", "Prosthesis Location"]]
+    objective_data = replace_NaN(objective_data, ["id", "Initials", "Age", "Gender", "BMI", "Date of prosthesis insertion", "Date of symptom onset", "Date of scan", 
+                           "Result of bone scan", "Ortho Decision", "Comorbidities", "FOV", "Prosthesis Location"])
     print(objective_data.head(10))
 
     # Making a seperate table for outcome information
     outcome_data = data[["Negative Scan Outcome", "Positive Scan Outcome"]]
+    outcome_data = replace_NaN(outcome_data, ["Negative Scan Outcome", "Positive Scan Outcome"])
     # print(outcome_data.head())
     
     # Making a seperate table for subjective information
     subjective_data = data[["Reason for intervention", "Reason for no intervention", "Additional information"]]
+    subjective_data = replace_NaN(subjective_data, ["Reason for intervention", "Reason for no intervention", "Additional information"])
     # print(subjective_data.head(10))
 
     # Age numerical stats
@@ -182,9 +200,9 @@ def main():
 
     # print(type(list(objective_data["Date of prosthesis insertion"])[0]))
     
-    outcome_data = replace_NaN(outcome_data, ["Negative Scan Outcome", "Positive Scan Outcome"])
     plot_scan_outcomes(outcome_data, ["Negative Scan Outcome", "Positive Scan Outcome"])
 
+    plot_demographics(objective_data)
 
 if __name__ == "__main__":
     main()
