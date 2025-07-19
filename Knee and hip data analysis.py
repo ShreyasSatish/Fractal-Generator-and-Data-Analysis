@@ -39,7 +39,17 @@ Targeted %: {round(stat[1], 2)}
 Whole Body: {stat[2]}
 Whole Body %: {round(stat[3], 2)}
 Ratio (WB:T): 1:{round(stat[4], 2)}
-Number: {stat[-1]}""")
+Number: {stat[-1]}
+""")
+    elif category == "Prosthetic Location":
+        print(f"""{category}:
+Knee: {stat[0]}
+Knee %: {round(stat[1], 2)}
+Hip: {stat[2]}
+Hip %: {round(stat[3], 2)}
+Ratio (H:K): 1:{round(stat[4], 2)}
+Number: {stat[-1]}
+""")
     else:
         print("Category not recognised")
     
@@ -96,6 +106,15 @@ def scan_stats(objective_data):
     whole_percentage = (whole_count / number) * 100
     whole_to_targeted_ratio = targeted_count / whole_count
     return [targeted_count, targeted_percentage, whole_count, whole_percentage, whole_to_targeted_ratio, number]
+
+def prosthetic_stats(objective_data):
+    number = objective_data["Prosthesis Location"].count()
+    knee_count = len(objective_data[objective_data["Prosthesis Location"] == "K"])
+    knee_percentage = (knee_count / number) * 100
+    hip_count = len(objective_data[objective_data["Prosthesis Location"] == "H"])
+    hip_percentage = (hip_count / number) * 100
+    hip_to_knee_ratio = knee_count / hip_count
+    return [knee_count, knee_percentage, hip_count, hip_percentage, hip_to_knee_ratio, number]
 
 def times_between(objective_data):
     # time_difference = lambda row: 0 if (row["Date of prosthesis insertion"] == row["Date of symptom onset"]) else ((row["Date of symptom onset"] - row["Date of prosthesis insertion"]) * 12) if (type(row["Date of symptom onset"]) == type(row["Date of prosthesis insertion"]) == int)
@@ -206,10 +225,14 @@ def main():
     scan_information = scan_stats(objective_data)
     display_stats(scan_information, "FOV")
 
+    # Prosthetic Location numerical stats
+    prosthetic_information = prosthetic_stats(objective_data)
+    display_stats(prosthetic_information, "Prosthetic Location")
+
     # print(type(list(objective_data["Date of prosthesis insertion"])[0]))
     
+    # Plotting scan outcomes and some useful demographic comparisons
     plot_scan_outcomes(outcome_data, ["Negative Scan Outcome", "Positive Scan Outcome"])
-
     plot_demographics(objective_data)
 
 if __name__ == "__main__":
