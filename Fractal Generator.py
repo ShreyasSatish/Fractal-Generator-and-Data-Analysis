@@ -4,7 +4,6 @@ import numpy as np
 def generate_mandelbrot():
     # Function to generate the Mandelbrot set and display it 
 
-    # Variable assignment
     real_min = -1.0
     real_max = 1.0
     imag_min = -1.0
@@ -25,7 +24,7 @@ def generate_mandelbrot():
         for y in y_axis:
             c_values.append(complex(x, y))
 
-    # Iterating over the c values and appending to a list
+    # Iterating over the c values and appending how long they took to "escape" to a list
     escaped = []
     for c in c_values:
         iterations = 0
