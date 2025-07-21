@@ -198,6 +198,38 @@ def times_between(objective_data):
                              np.max(symptom_to_scan), np.min(symptom_to_scan),
                              len(symptom_to_scan)]
     
+    # Plotting the dates in a histogram, and displaying key stat(s) on it as well
+    fig4, [ax1, ax2, ax3] = plt.subplots(ncols=3, figsize=(17, 8))
+
+    ax1.hist(insertion_to_symptom, color="b", rwidth=1, bins=np.arange(0, insertion_to_symptom_stats[4]))
+    ax1.set_title("Time between Prosthesis insertion to Symptom onset")
+    ax1.set_xlabel("Time in Months")
+    ax1.set_ylabel("Number of Patients")
+    ax1.axvline(insertion_to_symptom_stats[0], color="r", linestyle="--", linewidth=0.8)
+    # Magic numbers to get text in spots that look nicer
+    ax1.text(insertion_to_symptom_stats[0] - 11, 0.5, "Mean", rotation=90, transform=ax1.get_xaxis_text1_transform(0)[0])
+    ax1.text(insertion_to_symptom_stats[0] + 1, 0.9, round(insertion_to_symptom_stats[0], 2), rotation=90, transform=ax1.get_xaxis_text1_transform(0)[0])
+    
+    ax2.hist(insertion_to_scan, color="g", rwidth=1, bins=np.arange(0, insertion_to_scan_stats[4]))
+    ax2.set_title("Time between Prosthesis insertion to Scan date")
+    ax2.set_xlabel("Time in Months")
+    ax2.set_ylabel("Number of Patients")
+    ax2.axvline(insertion_to_scan_stats[0], color="r", linestyle="--", linewidth=0.8)
+    # Magic numbers to get text in spots that look nicer
+    ax2.text(insertion_to_scan_stats[0] - 14, 0.5, "Mean", rotation=90, transform=ax2.get_xaxis_text1_transform(0)[0])
+    ax2.text(insertion_to_scan_stats[0] + 1, 0.9, round(insertion_to_scan_stats[0], 2), rotation=90, transform=ax2.get_xaxis_text1_transform(0)[0])
+
+    ax3.hist(symptom_to_scan, color="c", rwidth=1, bins=np.arange(0, symptom_to_scan_stats[4]))
+    ax3.set_title("Time between Symptom onset to Scan date")
+    ax3.set_xlabel("Time in Months")
+    ax3.set_ylabel("Number of Patients")
+    ax3.axvline(symptom_to_scan_stats[0], color="r", linestyle="--", linewidth=0.8)
+    # Magic numbers to get text in spots that look nicer
+    ax3.text(symptom_to_scan_stats[0] - 9, 0.5, "Mean", rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
+    ax3.text(symptom_to_scan_stats[0] + 1, 0.9, round(symptom_to_scan_stats[0], 2), rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
+
+    plt.show()
+    
     # Displaying the statistics in a nicer format
     print(f"""Time in months between Prosthesis Insertion and Symptom onset:
 Mean: {round(insertion_to_symptom_stats[0], 2)}
@@ -228,7 +260,7 @@ Maximum: {round(symptom_to_scan_stats[4], 2)}
 Minimum: {round(symptom_to_scan_stats[5], 2)}
 Number: {symptom_to_scan_stats[-1]}
 """)
-
+    
     return insertion_to_symptom_stats, insertion_to_scan_stats, symptom_to_scan_stats
 
 def plot_scan_outcomes(df, columns):
@@ -334,9 +366,9 @@ def main():
     prosthetic_information = prosthetic_stats(objective_data)
     display_stats(prosthetic_information, "Prosthetic Location")
     
-    # Plotting scan outcomes and some useful demographic comparisons
-    plot_scan_outcomes(outcome_data, ["Negative Scan Result", "Positive Scan Result"])
-    plot_demographics(objective_data)
+    # # Plotting scan outcomes and some useful demographic comparisons
+    # plot_scan_outcomes(outcome_data, ["Negative Scan Result", "Positive Scan Result"])
+    # plot_demographics(objective_data)
 
     insertion_to_symptom_stats, insertion_to_scan_stats, symptom_to_scan_stats = times_between(objective_data)
 
