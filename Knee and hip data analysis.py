@@ -366,9 +366,9 @@ def main():
     prosthetic_information = prosthetic_stats(objective_data)
     display_stats(prosthetic_information, "Prosthetic Location")
     
-    # # Plotting scan outcomes and some useful demographic comparisons
-    # plot_scan_outcomes(outcome_data, ["Negative Scan Result", "Positive Scan Result"])
-    # plot_demographics(objective_data)
+    # Plotting scan outcomes and some useful demographic comparisons
+    plot_scan_outcomes(outcome_data, ["Negative Scan Result", "Positive Scan Result"])
+    plot_demographics(objective_data)
 
     insertion_to_symptom_stats, insertion_to_scan_stats, symptom_to_scan_stats = times_between(objective_data)
 
