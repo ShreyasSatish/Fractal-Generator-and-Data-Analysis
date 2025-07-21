@@ -112,9 +112,9 @@ def scan_stats(objective_data):
 
 def prosthetic_stats(objective_data):
     number = objective_data["Prosthesis Location"].count()
-    knee_count = len(objective_data[objective_data["Prosthesis Location"] == "K"])
+    knee_count = len(objective_data[objective_data["Prosthesis Location"] == "K"]) + 1
     knee_percentage = (knee_count / number) * 100
-    hip_count = len(objective_data[objective_data["Prosthesis Location"] == "H"])
+    hip_count = len(objective_data[objective_data["Prosthesis Location"] == "H"]) + 1
     hip_percentage = (hip_count / number) * 100
     hip_to_knee_ratio = knee_count / hip_count
     return [knee_count, knee_percentage, hip_count, hip_percentage, hip_to_knee_ratio, number]
