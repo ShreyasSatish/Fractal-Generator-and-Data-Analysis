@@ -36,9 +36,11 @@ def generate_mandelbrot(real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_max=1.0
     ax.imshow(escaped_array, cmap=color_map)
     ax.set_axis_off()
     ax.set_title("Mandelbrot Set Fractal")
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
     plt.show()
     
-def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=complex(-0.5125, 0.5213),
+def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=complex(-0.7885, 0),
                    height=600, width=800, max_iterations=100, resolution_factor=1,
                    color_map="magma_r"):
     """Generate a Julia Set and display it"""
@@ -73,12 +75,14 @@ def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=c
     ax.set_axis_off()
     ax.set_title("Julia Set Fractal")
     ax.set_aspect("equal")
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
     plt.show()
 
 def main():
-    generate_mandelbrot(resolution_factor=2)
+    generate_mandelbrot(max_iterations=200)
 
-    generate_julia(resolution_factor=2)
+    generate_julia(max_iterations=200)
 
 if __name__ == "__main__":
     main()
