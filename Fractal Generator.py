@@ -88,6 +88,9 @@ def main():
     generate_mandelbrot(max_iterations=200, resolution_factor=5)
     
     generate_julia(max_iterations=200, resolution_factor=5, c=complex(-0.7269, 0.1889))
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 if __name__ == "__main__":
