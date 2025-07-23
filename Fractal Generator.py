@@ -50,7 +50,9 @@ def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=c
                    height=600, width=800, max_iterations=100, resolution_factor=1,
                    color_map="magma_r"):
     """Generate a Julia Set and display it"""
-    
+    array_shape = (height * resolution_factor, width * resolution_factor)
+    escaped_threshold = 2
+
     x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor)
     y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor)
 
@@ -58,33 +60,37 @@ def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=c
     x_axis = real_min + (x_axis / (width * resolution_factor)) * (real_max - real_min)
     y_axis = imag_min + (y_axis / (height * resolution_factor)) * (imag_max - imag_min)
 
-    # Making array of complex values
-    z_values = []
-    for y in y_axis:
-        for x in x_axis:
-            z_values.append(complex(x, y))
+    # Making a 2D array of the values
+    real_2d, imag_2d = np.meshgrid(x_axis, y_axis)
+    z_array = real_2d + imag_2d * 1j
 
     # Iterating over z values and appending how long they took to "escape" to a list
-    escaped = []
-    for z in z_values:
-        iterations = 0
-        while (iterations < max_iterations) and (abs(z) < 2):
-            z = z**2 + c
-            iterations += 1
-        escaped.append(iterations)
-    # Reshape into an array so that it can be plotted in the imshow function
-    escaped_array = np.asarray(escaped).reshape(height * resolution_factor, width * resolution_factor)
+    c_values = np.full(shape=array_shape, fill_value=c, dtype=complex)
+    iterations = np.zeros(array_shape)
+    active_mask = np.full(array_shape, fill_value=True, dtype=bool)
+
+    for iteration_num in range(1, max_iterations + 1):
+        z_array[active_mask] = z_array[active_mask]**2 + c_values[active_mask]
+        magnitudes = np.abs(z_array)
+        escaped_check = (magnitudes > escaped_threshold)
+        new_mask = active_mask & escaped_check
+        iterations[new_mask] = iteration_num
+        active_mask = active_mask & (~new_mask)
+
+        if not np.any(active_mask):
+            break
+    
+    iterations[active_mask] = max_iterations
 
     # Plotting the array of escaped values using imshow
     fig, ax = plt.subplots(figsize=(10,5))
-    ax.imshow(escaped_array, cmap=color_map)
+    ax.imshow(iterations, cmap=color_map)
     ax.set_axis_off()
     ax.set_title("Julia Set Fractal")
     ax.set_aspect("equal")
     manager = plt.get_current_fig_manager()
     manager.window.state("zoomed")
     plt.show()
-
 def main():
     generate_mandelbrot(max_iterations=200, resolution_factor=10)
 
