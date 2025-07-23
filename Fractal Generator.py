@@ -80,9 +80,15 @@ def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=c
     plt.show()
 
 def main():
+<<<<<<< Updated upstream
     generate_mandelbrot(max_iterations=200, resolution_factor=10)
 
     generate_julia(max_iterations=200)
+=======
+    generate_mandelbrot(max_iterations=200, resolution_factor=5)
+    
+    generate_julia(max_iterations=200, resolution_factor=5, c=complex(-0.7269, 0.1889))
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()
