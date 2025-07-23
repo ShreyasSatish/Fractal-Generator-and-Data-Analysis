@@ -5,6 +5,7 @@ def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_ma
                         height=600, width=800, max_iterations=200, resolution_factor=1,
                         color_map="magma_r"):
     """Generate the Mandelbrot Set and display it"""
+    
     if d < 2:
         print("Error: Please enter a value of d that is supported")
         return
@@ -63,12 +64,17 @@ def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_ma
     manager.window.state("zoomed")
     plt.show()
     
-def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=complex(-0.7269, 0.1889),
+def generate_julia(d=2, real_min=-1.5, real_max=1.5, imag_min=-1.5, imag_max=1.5, c=complex(-0.7269, 0.1889),
                    height=600, width=800, max_iterations=200, resolution_factor=1,
                    color_map="magma_r"):
     """Generate a Julia Set and display it"""
+    
+    if d < 2:
+        print("Error: Please enter a value of d that is supported")
+        return
+    
     array_shape = (height * resolution_factor, width * resolution_factor)
-    escaped_threshold = 2
+    escaped_threshold = 2**(1/(d-1))
 
     x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor)
     y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor)
@@ -108,10 +114,11 @@ def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=c
     manager = plt.get_current_fig_manager()
     manager.window.state("zoomed")
     plt.show()
-def main():
-    generate_mandelbrot(d=10)
 
-    # generate_julia()
+def main():
+    # generate_mandelbrot(d=10)
+
+    generate_julia(max_iterations=500)
 
 if __name__ == "__main__":
     main()
