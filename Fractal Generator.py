@@ -1,12 +1,29 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def generate_mandelbrot(real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_max=1.0,
-                        height=600, width=800, max_iterations=100, resolution_factor=1,
+def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_max=1.0,
+                        height=600, width=800, max_iterations=200, resolution_factor=1,
                         color_map="magma_r"):
     """Generate the Mandelbrot Set and display it"""
+    if d < 2:
+        print("Error: Please enter a value of d that is supported")
+        return
+    
+    # Changing the axes centering for different exponent values
+    match (d):
+        case 2:
+            real_min = -2.0
+            real_max = 0.5
+            imag_min = -1.0
+            imag_max = 1.0
+        case _:
+            real_min = -1.5
+            real_max = 1.5
+            imag_min = -1.5
+            imag_max = 1.5    
+
     array_shape = (height * resolution_factor, width * resolution_factor)
-    escaped_threshold = 2
+    escaped_threshold = 2**(1/(d-1))
     
     x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor)
     y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor)
@@ -25,7 +42,7 @@ def generate_mandelbrot(real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_max=1.0
     active_mask = np.full(array_shape, fill_value=True, dtype=bool)
 
     for iteration_num in range(1, max_iterations + 1):
-        z_array[active_mask] = z_array[active_mask]**2 + c_values[active_mask]
+        z_array[active_mask] = z_array[active_mask]**d + c_values[active_mask]
         magnitudes = np.abs(z_array)
         escaped_check = (magnitudes > escaped_threshold)
         new_mask = active_mask & escaped_check
@@ -46,8 +63,8 @@ def generate_mandelbrot(real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_max=1.0
     manager.window.state("zoomed")
     plt.show()
     
-def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=complex(-0.7885, 0),
-                   height=600, width=800, max_iterations=100, resolution_factor=1,
+def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=complex(-0.7269, 0.1889),
+                   height=600, width=800, max_iterations=200, resolution_factor=1,
                    color_map="magma_r"):
     """Generate a Julia Set and display it"""
     array_shape = (height * resolution_factor, width * resolution_factor)
@@ -92,9 +109,9 @@ def generate_julia(real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0, c=c
     manager.window.state("zoomed")
     plt.show()
 def main():
-    generate_mandelbrot(max_iterations=200, resolution_factor=10)
+    generate_mandelbrot(d=10)
 
-    generate_julia(max_iterations=200)
+    # generate_julia()
 
 if __name__ == "__main__":
     main()
