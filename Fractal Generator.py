@@ -26,8 +26,8 @@ def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_ma
     array_shape = (height * resolution_factor, width * resolution_factor)
     escaped_threshold = 2**(1/(d-1))
     
-    x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor)
-    y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor)
+    x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor, dtype=np.float32)
+    y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor, dtype=np.float32)
 
     # Mapping pixel to complex values
     x_axis = real_min + (x_axis / (width * resolution_factor)) * (real_max - real_min)
@@ -38,14 +38,14 @@ def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_ma
     c_values = real_2d + imag_2d * 1j
 
     # Iterating over the c values and appending how long they took to "escape" to a list
-    z_array = np.zeros(array_shape, dtype=complex)
-    iterations = np.zeros(array_shape)
+    z_array = np.zeros(array_shape, dtype=np.complex64)
+    iterations = np.zeros(array_shape, dtype=np.int32)
     active_mask = np.full(array_shape, fill_value=True, dtype=bool)
 
     for iteration_num in range(1, max_iterations + 1):
         z_array[active_mask] = z_array[active_mask]**d + c_values[active_mask]
-        magnitudes = np.abs(z_array)
-        escaped_check = (magnitudes > escaped_threshold)
+        squared_magnitudes = z_array.real**2 + z_array.imag**2
+        escaped_check = (squared_magnitudes > escaped_threshold**2)
         new_mask = active_mask & escaped_check
         iterations[new_mask] = iteration_num
         active_mask = active_mask & (~new_mask)
@@ -76,8 +76,8 @@ def generate_julia(d=2, real_min=-1.5, real_max=1.5, imag_min=-1.5, imag_max=1.5
     array_shape = (height * resolution_factor, width * resolution_factor)
     escaped_threshold = 2**(1/(d-1))
 
-    x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor)
-    y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor)
+    x_axis = np.linspace(0, (width * resolution_factor) - 1, num=width*resolution_factor, dtype=np.float32)
+    y_axis = np.linspace(0, (height * resolution_factor) - 1, num=height*resolution_factor, dtype=np.float32)
 
     # Mapping pixel to complex values
     x_axis = real_min + (x_axis / (width * resolution_factor)) * (real_max - real_min)
@@ -88,17 +88,19 @@ def generate_julia(d=2, real_min=-1.5, real_max=1.5, imag_min=-1.5, imag_max=1.5
     z_array = real_2d + imag_2d * 1j
 
     # Iterating over z values and appending how long they took to "escape" to a list
-    c_values = np.full(shape=array_shape, fill_value=c, dtype=complex)
-    iterations = np.zeros(array_shape)
+    c_values = np.full(shape=array_shape, fill_value=c, dtype=np.complex64)
+    iterations = np.zeros(array_shape, np=np.int32)
     active_mask = np.full(array_shape, fill_value=True, dtype=bool)
 
+    print("entering loop")
     for iteration_num in range(1, max_iterations + 1):
         z_array[active_mask] = z_array[active_mask]**2 + c_values[active_mask]
-        magnitudes = np.abs(z_array)
-        escaped_check = (magnitudes > escaped_threshold)
+        squared_magnitudes = z_array.real**2 + z_array.imag**2
+        escaped_check = (squared_magnitudes > escaped_threshold**2)
         new_mask = active_mask & escaped_check
         iterations[new_mask] = iteration_num
         active_mask = active_mask & (~new_mask)
+        print(f"on loop {iteration_num}")
 
         if not np.any(active_mask):
             break
@@ -116,9 +118,9 @@ def generate_julia(d=2, real_min=-1.5, real_max=1.5, imag_min=-1.5, imag_max=1.5
     plt.show()
 
 def main():
-    # generate_mandelbrot(d=10)
+    generate_mandelbrot(max_iterations=500, resolution_factor=5)
 
-    generate_julia(max_iterations=500)
+    # generate_julia(max_iterations=500)
 
 if __name__ == "__main__":
     main()
