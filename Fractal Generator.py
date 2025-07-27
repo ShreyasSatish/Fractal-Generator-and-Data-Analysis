@@ -121,8 +121,8 @@ def generate_julia(d=2, real_min=-1.5, real_max=1.5, imag_min=-1.5, imag_max=1.5
     manager.window.state("zoomed")
     plt.show()
 
-def generate_newton(coefficients, domain=[-5.0,5.0], real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0,
-                    tolerance=10**(-6), height=600, width=800, max_iterations=200, resolution_factor=1,
+def generate_newton(coefficients=[-1,0,0,1], a=1, domain=[-1.0,1.0], real_min=-2.0, real_max=2.0, imag_min=-2.0, imag_max=2.0,
+                    tolerance=1e-6, height=600, width=800, max_iterations=200, resolution_factor=1,
                     color_map="magma_r"):
     """Generate a Newton Fractal with the input coefficients of the polynomial
     Formula of Newton Method is: z(n+1) = z(n) - P(z(n))/P'(z(n))
@@ -143,24 +143,88 @@ def generate_newton(coefficients, domain=[-5.0,5.0], real_min=-2.0, real_max=2.0
     y_axis = imag_min + (y_axis / (height * resolution_factor)) * (imag_max - imag_min)
    
     # Forming a grid of the z values
-    real_2d, imag_2d = np.meshgrid(x_axis, y_axis)
+    real_2d, imag_2d = np.meshgrid(x_axis, y_axis, indexing="xy")
     z_values = real_2d + imag_2d * 1j
     iterations = np.zeros(shape=array_shape, dtype=np.int32)
     active_mask = np.full(shape=array_shape, fill_value=True, dtype=bool)
-    root_assignment_array = np.zeros(shape=array_shape, dtype=np.complex64)
+    root_assignment_array = np.full(shape=array_shape, fill_value=len(P_roots), dtype=np.int8)
 
     for iteration_num in range(1, max_iterations + 1):
-        P_val = P(z_values[active_mask])
-        P_deriv_val = P_deriv(z_values[active_mask])
-        P_deriv_val_magnitudes = 1
-        z_values[active_mask] = z_values[active_mask] - (P_val / P_deriv_val)
+        P_val_active = P(z_values[active_mask])
+        P_deriv_val_active = P_deriv(z_values[active_mask])
+        
+        # Check if derivative has magnitude close to 0
+        near_zero_deriv_1d = (np.abs(P_deriv_val_active) < tolerance)
 
-    return
+        # Create a mask, holds positions of all pixels with near-zero derivatives
+        full_near_zero_deriv_mask_2d = np.full(shape=array_shape, fill_value=False, dtype=bool)
+
+        # For active pixels with a near-zero derivative, places True values in its position
+        full_near_zero_deriv_mask_2d[active_mask] = near_zero_deriv_1d
+
+        # Assign a special root ID of -1 to ones with near 0 division
+        root_assignment_array[full_near_zero_deriv_mask_2d] = -1
+
+        # Record current iteration for problematic derivatives
+        iterations[full_near_zero_deriv_mask_2d] = iteration_num
+
+        # Deactivate pixels of problematic derivatives
+        active_mask[full_near_zero_deriv_mask_2d] = False
+
+        # Actual Newton iteration formula
+        # Only select ones which do not cause derivative issues
+        z_values[active_mask] = z_values[active_mask] - a*(P_val_active[~near_zero_deriv_1d] / P_deriv_val_active[~near_zero_deriv_1d])
+        
+        # Calculate distance from each active pixel to all knwon roots
+        distance_to_roots_active_1d = np.abs(z_values[active_mask, np.newaxis] - P_roots)
+
+        # Find the closest root
+        closest_root_indicies = np.argmin(distance_to_roots_active_1d, axis=1)
+        num_active_points = distance_to_roots_active_1d.shape[0]
+
+        # Extract minimum distance for each pixel
+        min_distances_active = distance_to_roots_active_1d[np.arange(num_active_points), closest_root_indicies]
+
+        # Identify which pixels have converged 
+        converged = (min_distances_active < tolerance)
+
+        # Mask newly converged points
+        converged_mask = np.full(shape=array_shape, fill_value=False, dtype=bool)
+        converged_mask[active_mask] = converged
+        iterations[converged_mask] = iteration_num
+
+        # Assign ID of root that each converged point converged to
+        root_assignment_array[converged_mask] = closest_root_indicies[converged]
+        active_mask[converged_mask] = False
+        iterations[active_mask] = max_iterations
+        root_assignment_array[active_mask] = len(P_roots)
+        
+
+        if not np.any(active_mask):
+            break
+
+    iterations[active_mask] = max_iterations
+    plot_data = root_assignment_array.copy()
+    plot_data[plot_data == -1] = len(P_roots) + 1
+
+    fig, ax = plt.subplots(figsize=(10,5))
+    ax.imshow(plot_data, cmap=color_map, extent=[real_min, real_max, imag_min, imag_max])
+    ax.set_axis_off()
+    ax.set_title("Newton Set Fractal")
+    ax.set_aspect("equal")
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
+    plt.show()        
 
 def main():
-    generate_mandelbrot(max_iterations=500, color_map="hot")
+    # generate_mandelbrot(max_iterations=500, color_map="hot")
 
-    generate_julia(max_iterations=500, c=complex(-0.8, 0.156), color_map="hot")
+    # generate_julia(max_iterations=500, c=complex(-0.8, 0.156), color_map="hot")
+
+    # Cool ones: [-16, 0, 0, 0, 15, 0, 0, 0, 1], 
+    # [-1, 0, 0, 1, 0, 0, 1]
+    # 
+    generate_newton(a=0.5, resolution_factor=1)
 
 if __name__ == "__main__":
     main()
