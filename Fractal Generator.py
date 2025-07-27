@@ -224,7 +224,7 @@ def main():
     # Cool ones: [-16, 0, 0, 0, 15, 0, 0, 0, 1], 
     # [-1, 0, 0, 1, 0, 0, 1]
     # 
-    generate_newton(a=0.5, resolution_factor=1)
+    generate_newton()
 
 if __name__ == "__main__":
     main()
