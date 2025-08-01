@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numba import jit, njit
+
 
 def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_max=1.0,
                         height=600, width=800, max_iterations=200, resolution_factor=1,
@@ -9,23 +9,6 @@ def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_ma
     Iteration formula is: z(n+1) = z(n)**d + c
     The c values are taken from the point of calculation
     The z values are always 0"""
-    
-    @jit
-    def mandelbrot_iterate(iterations, max_iterations, z_array, active_mask, d, c_values, escaped_threshold):
-        next_z_values = np.empty_like(z_array)
-        for iteration_num in range(1, max_iterations + 1):
-            next_z_values = z_array**d + c_values
-            z_array[active_mask] = next_z_values[active_mask]
-            squared_magnitudes = z_array.real**2 + z_array.imag**2
-            escaped_check = (squared_magnitudes > escaped_threshold**2)
-            new_mask = active_mask & escaped_check
-            iterations[new_mask] = iteration_num
-            active_mask = active_mask & (~new_mask)
-    
-            if not np.any(active_mask):
-                break
-        
-        return iterations, active_mask
     
     if d < 2:
         print("Error: Please enter a value of d that is supported")
@@ -62,10 +45,17 @@ def generate_mandelbrot(d=2, real_min=-2.0, real_max=0.5, imag_min=-1.0, imag_ma
     z_array = np.zeros(array_shape, dtype=np.complex64)
     iterations = np.zeros(array_shape, dtype=np.int32)
     active_mask = np.full(array_shape, fill_value=True, dtype=bool)
-    
 
-    iterations, active_mask = mandelbrot_iterate(iterations, max_iterations, z_array, 
-                                                 active_mask, d, c_values, escaped_threshold)
+    for iteration_num in range(1, max_iterations + 1):
+        z_array[active_mask] = z_array[active_mask]**d + c_values[active_mask]
+        squared_magnitudes = z_array.real**2 + z_array.imag**2
+        escaped_check = (squared_magnitudes > escaped_threshold**2)
+        new_mask = active_mask & escaped_check
+        iterations[new_mask] = iteration_num
+        active_mask = active_mask & (~new_mask)
+
+        if not np.any(active_mask):
+            break
     
     iterations[active_mask] = max_iterations
 
@@ -229,13 +219,13 @@ def generate_newton(coefficients=[-1,0,0,1], a=1, domain=[-1.0,1.0], real_min=-2
 
 def main():
     
-    generate_mandelbrot(max_iterations=500)
+    # generate_mandelbrot(max_iterations=500)
 
     # generate_julia(max_iterations=500, c=complex(-0.8, 0.156), color_map="hot")
 
     # Cool ones: [-16, 0, 0, 0, 15, 0, 0, 0, 1], 
     # [-1, 0, 0, 1, 0, 0, 1]
-    # generate_newton()
+    generate_newton()
 
 if __name__ == "__main__":
     main()
