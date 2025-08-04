@@ -51,6 +51,17 @@ Hip %: {round(stat[3], 2)}
 Ratio (H:K): 1:{round(stat[4], 2)}
 Number: {stat[-1]}
 """)
+    elif category == "Aspiration Result":
+        print(f"""{category}:
+Positive: {stat[0]}
+Positive %: {round(stat[1], 2)}
+Negative: {stat[2]}
+Negative %: {round(stat[3], 2)}
+Undetermined: {stat[4]}
+Undetermined %: {round(stat[5], 2)}
+Ratio (P:N:U): 1:{round(stat[6], 2)}:{round(stat[7], 2)}
+Number: {stat[-1]}
+""")
     else:
         print("Category not recognised")
     
@@ -228,6 +239,8 @@ def times_between(objective_data):
     ax3.text(symptom_to_scan_stats[0] - 9, 0.5, "Mean", rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
     ax3.text(symptom_to_scan_stats[0] + 1, 0.9, round(symptom_to_scan_stats[0], 2), rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
 
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
     plt.show()
     
     # Displaying the statistics in a nicer format
@@ -299,6 +312,8 @@ def plot_scan_outcomes(df, columns):
 
     plt.figure(1)    
     plt.tight_layout(pad=3.0) 
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
     plt.show()
 
 def plot_demographics(df):
@@ -312,13 +327,38 @@ def plot_demographics(df):
     y = df["BMI"][mask]
     r, p = stats.pearsonr(x=x, y=y)
     plt.text(.01, .95, "Correlation Coefficient = {:.2f}".format(r), transform=ax2.transAxes)
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
     plt.show()
 
     plt.figure(3)
     sns.boxplot(data=df, x="Gender", y="BMI")
     plt.title("Comparison of BMI spread with Gender")
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
     plt.show()
 
+def infection_stats(infection_data):
+    number = infection_data[infection_data["Aspiration Result"] != np.nan].count()[0]
+    positive_count = len(infection_data[infection_data["Aspiration Result"] == "Positive"])
+    positive_percentage = (positive_count / number) * 100
+    negative_count = len(infection_data[infection_data["Aspiration Result"] == "Negative"])
+    negative_percentage = (negative_count / number) * 100
+    undertermined_count = len(infection_data[infection_data["Aspiration Result"] == "Undetermined"])
+    undertermined_percentage = (undertermined_count / number) * 100
+    positive_to_negative_ratio = negative_count / positive_count
+    positive_to_undetermined_ratio = undertermined_count / positive_count
+    fig, ax = plt.subplots()
+    sns.countplot(x="Aspiration Result", data=infection_data)
+    plt.xlabel("Result")
+    plt.ylabel("Number")
+    plt.title("Outcome of Aspiration/Biopsy")
+    manager = plt.get_current_fig_manager()
+    manager.window.state("zoomed")
+    plt.show()
+    
+    return [positive_count, positive_percentage, negative_count, negative_percentage, undertermined_count, 
+            undertermined_percentage, positive_to_negative_ratio, positive_to_undetermined_ratio, number]
 
 
 def main():
@@ -341,6 +381,12 @@ def main():
     subjective_data = data[["Reason for intervention", "Reason for no intervention", "Additional information"]]
     subjective_data = replace_NaN(subjective_data, ["Reason for intervention", "Reason for no intervention", "Additional information"])
     # print(subjective_data.head(10))
+
+    infection_data = data[["Aspiration Result"]]
+    infection_data = replace_NaN(infection_data, ["Aspiration Result"])
+    # print(infection_data.head(10))
+    infection_information = infection_stats(infection_data)
+    display_stats(infection_information, "Aspiration Result")
 
     # Age numerical stats
     age_information = age_stats(objective_data)
