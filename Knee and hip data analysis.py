@@ -351,7 +351,7 @@ def infection_stats(infection_data):
     fig, ax = plt.subplots()
     sns.countplot(x="Aspiration Result", data=infection_data)
     plt.xlabel("Result")
-    plt.ylabel("Number")
+    plt.ylabel("Number of Patients")
     plt.title("Outcome of Aspiration/Biopsy")
     manager = plt.get_current_fig_manager()
     manager.window.state("zoomed")
