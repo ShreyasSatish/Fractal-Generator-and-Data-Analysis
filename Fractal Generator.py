@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import dearpygui.dearpygui as dpg
-import dearpygui.demo as demo
 from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
+
 
 def fractal_generator():
 
@@ -19,8 +20,12 @@ def fractal_generator():
         resolution_factor = int(entry_resolution_factor.get())
         color_map = entry_color_map.get()
         
+        if resolution_factor >= 5:
+            if not messagebox.askokcancel(title="Warning", message="Large resolution factors can increase runtimes. Do you want to continue", icon="warning"):
+                return
+        
         if d < 2:
-            print("Error: Please enter a value of d that is supported")
+            messagebox.showerror(title="Error", message="Invalid value of d entered (d >= 2)")
             return
         
         # Changing the axes centering for different exponent values
@@ -226,15 +231,13 @@ def fractal_generator():
         manager.window.state("zoomed")
         plt.show()        
 
-    # def gui():
+
     """GUI Operations"""
     
     text_colour = "#706c68"
     bg_colour = "#f8e6d4"
     button_bg = "#f09c48"
-
-    def Continue():
-        print("clicked ")
+    tab_bg = "#f5d6b8"
 
     # Generate the window, initialise its height  and width and name
     window = Tk()
@@ -243,28 +246,48 @@ def fractal_generator():
     window.geometry("%dx%d" % (width, height))
     window.title("Fractal Generator - Shreyas Satish")
 
+    # Adding tabs to switch between what you are generating
+    notebook = ttk.Notebook(window)
+    mandelbrot_tab = Frame(notebook, bg=bg_colour)
+    julia_tab = Frame(notebook, bg=bg_colour)
+    newton_tab = Frame(notebook, bg=bg_colour)
+    info_tab = Frame(notebook, bg=bg_colour)
+
+    s = ttk.Style()
+    s.theme_use("default")
+    s.configure("TNotebook", background=tab_bg)
+    s.configure("TNotebook.Tab", background=button_bg)
+    s.map("TNotebook.Tab", background=[("selected", bg_colour)])
+
+    notebook.add(mandelbrot_tab, text="Mandelbrot Set")
+    notebook.add(julia_tab, text="Julia Set")
+    notebook.add(newton_tab, text="Newton Set")
+    notebook.add(info_tab, text="Info")
+
+    notebook.pack(expand=True, fill="both")
+
 
     """Mandelbrot Genertator Widgets"""
     # Making the entry fields to customise the generation
-    entry_d = Entry(window,
+    entry_d = Entry(mandelbrot_tab,
                   font=("Aptos",  13),
                   fg=text_colour
                   )
     entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
     entry_d.insert(0, "2")
-    entry_max_iterations = Entry(window,
+    entry_max_iterations = Entry(mandelbrot_tab,
                                  font=("Aptos", 13),
                                  fg=text_colour
                                  )
     entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.15)
     entry_max_iterations.insert(0, "100")
-    entry_resolution_factor = Entry(window,
+    entry_resolution_factor = Entry(mandelbrot_tab,
                                     font=("Aptos", 13),
                                     fg=text_colour
                                     )
     entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.2)
     entry_resolution_factor.insert(0, "1")
-    entry_color_map = Entry(window,
+    entry_color_map = Entry(mandelbrot_tab,
                             font=("Aptos", 13),
                             fg=text_colour
                             )
@@ -272,28 +295,28 @@ def fractal_generator():
     entry_color_map.insert(0, "magma_r")
 
     # Labeling the different entry fields
-    label_d = Label(window,
+    label_d = Label(mandelbrot_tab,
                     text="d (power)",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
     label_d.place(anchor=CENTER, relx=0.872, rely=0.075)
-    label_max_iterations = Label(window,
+    label_max_iterations = Label(mandelbrot_tab,
                     text="Max Iterations",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
     label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.125)
-    label_resolution_factor = Label(window,
+    label_resolution_factor = Label(mandelbrot_tab,
                     text="Resolution Factor",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
     label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.175)
-    label_color_map = Label(window,
+    label_color_map = Label(mandelbrot_tab,
                     text="Color Map",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
@@ -302,12 +325,41 @@ def fractal_generator():
     label_color_map.place(anchor=CENTER, relx=0.872, rely=0.225)
 
     # Make the generate button
-    generate_button = Button(window,
+    generate_button = Button(mandelbrot_tab,
                              text="Generate",
                              font=("Aptos", 15, "bold"),
-                             command=generate_mandelbrot)
+                             command=generate_mandelbrot,
+                             bg=button_bg
+                             )
     generate_button.place(anchor=CENTER, relx=0.9, rely=0.3)
 
+    """Julia Set Widgets"""
+
+    entry_d = Entry(julia_tab,
+                  font=("Aptos",  13),
+                  fg=text_colour
+                  )
+    entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
+    entry_c = Entry(julia_tab,
+                    font=("Aptos", 13),
+                    fg=text_colour
+                    )
+    entry_c.place(anchor=CENTER, relx=0.9, rely=0.15)
+    entry_max_iterations = Entry(julia_tab,
+                                 font=("Aptos", 13),
+                                 fg=text_colour
+                                 )
+    entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.2)
+    entry_resolution_factor = Entry(julia_tab,
+                                    font=("Aptos", 13),
+                                    fg=text_colour
+                                    )
+    entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.25)
+    entry_color_map = Entry(julia_tab,
+                            font=("Aptos", 13),
+                            fg=text_colour
+                            )
+    entry_color_map.place(anchor=CENTER, relx=0.9, rely=0.3)
 
     # Make the icon an image of a fractal
     icon = PhotoImage(file="Mandelbrot Logo.png")
@@ -321,6 +373,5 @@ def main():
     fractal_generator()
     
 
-    
 if __name__ == "__main__":
     main()
