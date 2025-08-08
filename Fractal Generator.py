@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from tkinter import *
 from tkinter import messagebox
@@ -6,6 +7,42 @@ from tkinter import ttk
 
 
 def fractal_generator():
+    color_map_list = ['viridis', 'plasma', 'inferno', 'magma', 'cividis',
+            'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
+            'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
+            'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn',
+            'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+            'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+            'hot', 'afmhot', 'gist_heat', 'copper',
+            'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+            'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic',
+            'berlin', 'managua', 'vanimo',
+            'twilight', 'twilight_shifted', 'hsv',
+            'Pastel1', 'Pastel2', 'Paired', 'Accent',
+            'Dark2', 'Set1', 'Set2', 'Set3',
+            'tab10', 'tab20', 'tab20b', 'tab20c',
+            'flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern',
+            'gnuplot', 'gnuplot2', 'CMRmap', 'cubehelix', 'brg',
+            'gist_rainbow', 'rainbow', 'jet', 'turbo', 'nipy_spectral',
+            'gist_ncar',
+            'viridis_r', 'plasma_r', 'inferno_r', 'magma_r', 'cividis_r',
+            'Greys_r', 'Purples_r', 'Blues_r', 'Greens_r', 'Oranges_r', 'Reds_r',
+            'YlOrBr_r', 'YlOrRd_r', 'OrRd_r', 'PuRd_r', 'RdPu_r', 'BuPu_r',
+            'GnBu_r', 'PuBu_r', 'YlGnBu_r', 'PuBuGn_r', 'BuGn_r', 'YlGn_r',
+            'binary_r', 'gist_yarg_r', 'gist_gray_r', 'gray_r', 'bone_r', 'pink_r',
+            'spring_r', 'summer_r', 'autumn_r', 'winter_r', 'cool_r', 'Wistia_r',
+            'hot_r', 'afmhot_r', 'gist_heat_r', 'copper_r',
+            'PiYG_r', 'PRGn_r', 'BrBG_r', 'PuOr_r', 'RdGy_r', 'RdBu_r',
+            'RdYlBu_r', 'RdYlGn_r', 'Spectral_r', 'coolwarm_r', 'bwr_r', 'seismic_r',
+            'berlin_r', 'managua_r', 'vanimo_r',
+            'twilight_r', 'twilight_shifted_r', 'hsv_r',
+            'Pastel1_r', 'Pastel2_r', 'Paired_r', 'Accent_r',
+            'Dark2_r', 'Set1_r', 'Set2_r', 'Set3_r',
+            'tab10_r', 'tab20_r', 'tab20b_r', 'tab20c_r',
+            'flag_r', 'prism_r', 'ocean_r', 'gist_earth_r', 'terrain_r', 'gist_stern_r',
+            'gnuplot_r', 'gnuplot2_r', 'CMRmap_r', 'cubehelix_r', 'brg_r',
+            'gist_rainbow_r', 'rainbow_r', 'jet_r', 'turbo_r', 'nipy_spectral_r',
+            'gist_ncar_r']
 
     def generate_mandelbrot(d=2,height=600, width=800, max_iterations=200, 
                         resolution_factor=1, color_map="magma_r"):
@@ -15,14 +52,19 @@ def fractal_generator():
         The z values are always 0"""
         
         # Grab the values from the entry fields in the GUI
-        d = int(entry_d.get())
-        max_iterations = int(entry_max_iterations.get())
-        resolution_factor = int(entry_resolution_factor.get())
-        color_map = entry_color_map.get()
+        d = int(m_entry_d.get())
+        max_iterations = int(m_entry_max_iterations.get())
+        resolution_factor = int(m_entry_resolution_factor.get())
+        color_map = m_entry_color_map.get()
         
-        if resolution_factor >= 5:
-            if not messagebox.askokcancel(title="Warning", message="Large resolution factors can increase runtimes. Do you want to continue", icon="warning"):
-                return
+        if not m_suppress.get():        
+            if resolution_factor >= 5 or max_iterations >= 1000:
+                if not messagebox.askokcancel(title="Warning", message="Large resolution factors or maximum iterations can increase runtimes. Do you want to continue?", icon="warning"):
+                    return
+        
+        if color_map not in color_map_list:
+            messagebox.showerror(title="Invalid Color Map", message="Please enter Color Map that is supported by Matplotlib")
+            return
         
         if d < 2:
             messagebox.showerror(title="Error", message="Invalid value of d entered (d >= 2)")
@@ -75,12 +117,15 @@ def fractal_generator():
 
         # Plotting the array of escaped values using imshow
         fig, ax = plt.subplots(figsize=(10,5))
+        ax.clear()
         ax.imshow(iterations, cmap=color_map)
         ax.set_axis_off()
         ax.set_title("Mandelbrot Set Fractal")
-        manager = plt.get_current_fig_manager()
-        manager.window.state("zoomed")
-        plt.show()
+        canvas = FigureCanvasTkAgg(fig, master=mandelbrot_tab)
+        canvas.get_tk_widget().pack()
+        # manager = plt.get_current_fig_manager()
+        # manager.window.state("zoomed")
+        # plt.show()
     
     def generate_julia(d=2, real_min=-1.5, real_max=1.5, imag_min=-1.5, imag_max=1.5, c=complex(-0.7269, 0.1889),
                    height=600, width=800, max_iterations=200, resolution_factor=1,
@@ -90,8 +135,30 @@ def fractal_generator():
         The c value is a fixed value that is passed in through the function
         The z values are taken from the point of calculation"""
         
+        d = int(j_entry_d.get())
+        try:
+            c = complex(float(j_entry_c.get().split(",")[0]), float(j_entry_c.get().split(",")[1]))
+        except ValueError:
+            messagebox.showerror(title="Format Error", message="Ensure your c value is in the format: a,b")
+            return
+        except:
+            messagebox.showerror(title="Error", message="Some other error has occured, check the terminal to diagnose")
+            return
+        max_iterations = int(j_entry_max_iterations.get())
+        resolution_factor = int(j_entry_resolution_factor.get())
+        color_map = j_entry_color_map.get()
+
+        if not j_suppress.get():
+            if resolution_factor >= 5 or max_iterations >= 1000:
+                if not messagebox.askokcancel(title="Warning", message="Large resolution factors or maximum iterations can increase runtimes. Do you want to continue?", icon="warning"):
+                    return
+        
+        if color_map not in color_map_list:
+            messagebox.showerror(title="Invalid Color Map", message="Please enter Color Map that is supported by Matplotlib")
+            return
+        
         if d < 2:
-            print("Error: Please enter a value of d that is supported")
+            messagebox.showerror(title="Value Error", message="Invalid value of d entered (d >= 2)")
             return
         
         array_shape = (height * resolution_factor, width * resolution_factor)
@@ -269,97 +336,173 @@ def fractal_generator():
 
     """Mandelbrot Genertator Widgets"""
     # Making the entry fields to customise the generation
-    entry_d = Entry(mandelbrot_tab,
+    m_entry_d = Entry(mandelbrot_tab,
                   font=("Aptos",  13),
                   fg=text_colour
                   )
-    entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
-    entry_d.insert(0, "2")
-    entry_max_iterations = Entry(mandelbrot_tab,
+    m_entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
+    m_entry_d.insert(0, "2")
+    m_entry_max_iterations = Entry(mandelbrot_tab,
                                  font=("Aptos", 13),
                                  fg=text_colour
                                  )
-    entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.15)
-    entry_max_iterations.insert(0, "100")
-    entry_resolution_factor = Entry(mandelbrot_tab,
+    m_entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.15)
+    m_entry_max_iterations.insert(0, "100")
+    m_entry_resolution_factor = Entry(mandelbrot_tab,
                                     font=("Aptos", 13),
                                     fg=text_colour
                                     )
-    entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.2)
-    entry_resolution_factor.insert(0, "1")
-    entry_color_map = Entry(mandelbrot_tab,
+    m_entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.2)
+    m_entry_resolution_factor.insert(0, "1")
+    m_entry_color_map = Entry(mandelbrot_tab,
                             font=("Aptos", 13),
                             fg=text_colour
                             )
-    entry_color_map.place(anchor=CENTER, relx=0.9, rely=0.25)
-    entry_color_map.insert(0, "magma_r")
+    m_entry_color_map.place(anchor=CENTER, relx=0.9, rely=0.25)
+    m_entry_color_map.insert(0, "magma_r")
 
     # Labeling the different entry fields
-    label_d = Label(mandelbrot_tab,
+    m_label_d = Label(mandelbrot_tab,
                     text="d (power)",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
-    label_d.place(anchor=CENTER, relx=0.872, rely=0.075)
-    label_max_iterations = Label(mandelbrot_tab,
+    m_label_d.place(anchor=CENTER, relx=0.872, rely=0.075)
+    m_label_max_iterations = Label(mandelbrot_tab,
                     text="Max Iterations",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
-    label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.125)
-    label_resolution_factor = Label(mandelbrot_tab,
+    m_label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.125)
+    m_label_resolution_factor = Label(mandelbrot_tab,
                     text="Resolution Factor",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
-    label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.175)
-    label_color_map = Label(mandelbrot_tab,
+    m_label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.175)
+    m_label_color_map = Label(mandelbrot_tab,
                     text="Color Map",
                     font=("Aptos", 13, "bold"),
                     fg=text_colour,
                     bg=bg_colour
                     )
-    label_color_map.place(anchor=CENTER, relx=0.872, rely=0.225)
+    m_label_color_map.place(anchor=CENTER, relx=0.872, rely=0.225)
 
     # Make the generate button
-    generate_button = Button(mandelbrot_tab,
+    m_generate_button = Button(mandelbrot_tab,
                              text="Generate",
                              font=("Aptos", 15, "bold"),
                              command=generate_mandelbrot,
                              bg=button_bg
                              )
-    generate_button.place(anchor=CENTER, relx=0.9, rely=0.3)
+    m_generate_button.place(anchor=CENTER, relx=0.9, rely=0.3)
+
+    # Make the suppress warning checkbox
+    m_suppress = BooleanVar()
+    m_checkbox = Checkbutton(mandelbrot_tab,
+                             text="Do not show runtime warnings",
+                             variable=m_suppress,
+                             onvalue=True,
+                             offvalue=False,
+                             bg=bg_colour,
+                             font=("Aptos", 10)
+                             )
+    m_checkbox.place(anchor=CENTER, relx=0.9, rely=0.35)
 
     """Julia Set Widgets"""
-
-    entry_d = Entry(julia_tab,
+    # Making entry fields to customise generation
+    j_entry_d = Entry(julia_tab,
                   font=("Aptos",  13),
                   fg=text_colour
                   )
-    entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
-    entry_c = Entry(julia_tab,
+    j_entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
+    j_entry_d.insert(0, "2")
+    j_entry_c = Entry(julia_tab,
                     font=("Aptos", 13),
                     fg=text_colour
                     )
-    entry_c.place(anchor=CENTER, relx=0.9, rely=0.15)
-    entry_max_iterations = Entry(julia_tab,
+    j_entry_c.place(anchor=CENTER, relx=0.9, rely=0.15)
+    j_entry_c.insert(0, "-0.7269,0.1889")
+    j_entry_max_iterations = Entry(julia_tab,
                                  font=("Aptos", 13),
                                  fg=text_colour
                                  )
-    entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.2)
-    entry_resolution_factor = Entry(julia_tab,
+    j_entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.2)
+    j_entry_max_iterations.insert(0, "100")
+    j_entry_resolution_factor = Entry(julia_tab,
                                     font=("Aptos", 13),
                                     fg=text_colour
                                     )
-    entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.25)
-    entry_color_map = Entry(julia_tab,
+    j_entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.25)
+    j_entry_resolution_factor.insert(0, "1")
+    j_entry_color_map = Entry(julia_tab,
                             font=("Aptos", 13),
                             fg=text_colour
                             )
-    entry_color_map.place(anchor=CENTER, relx=0.9, rely=0.3)
+    j_entry_color_map.place(anchor=CENTER, relx=0.9, rely=0.3)
+    j_entry_color_map.insert(0, "magma_r")
+
+    # Labeling the different entry fields
+    j_label_d = Label(julia_tab,
+                    text="d (power)",
+                    font=("Aptos", 13, "bold"),
+                    fg=text_colour,
+                    bg=bg_colour
+                    )
+    j_label_d.place(anchor=CENTER, relx=0.872, rely=0.075)
+    j_label_c = Label(julia_tab,
+                    text="c (complex)",
+                    font=("Aptos", 13, "bold"),
+                    fg=text_colour,
+                    bg=bg_colour
+                    )
+    j_label_c.place(anchor=CENTER, relx=0.875, rely=0.125)
+    j_label_max_iterations = Label(julia_tab,
+                    text="Max Iterations",
+                    font=("Aptos", 13, "bold"),
+                    fg=text_colour,
+                    bg=bg_colour
+                    )
+    j_label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.175)
+    j_label_resolution_factor = Label(julia_tab,
+                    text="Resolution Factor",
+                    font=("Aptos", 13, "bold"),
+                    fg=text_colour,
+                    bg=bg_colour
+                    )
+    j_label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.225)
+    j_label_color_map = Label(julia_tab,
+                              text="Color Map",
+                              font=("Aptos", 13, "bold"),
+                              fg=text_colour,
+                              bg=bg_colour
+                              )
+    j_label_color_map.place(anchor=CENTER, relx=0.872, rely=0.275)
+
+    # Make the generate button
+    j_generate_button = Button(julia_tab,
+                               text="Generate",
+                               font=("Aptos", 15, "bold"),
+                               command=generate_julia,
+                               bg=button_bg
+                               )
+    j_generate_button.place(anchor=CENTER, relx=0.9, rely=0.35)
+
+    # Make the suppress warning checkbox
+    j_suppress = BooleanVar()
+    j_checkbox = Checkbutton(julia_tab,
+                             text="Do not show runtime warnings",
+                             variable=j_suppress,
+                             onvalue=True,
+                             offvalue=False,
+                             bg=bg_colour,
+                             font=("Aptos", 10)
+                             )
+    j_checkbox.place(anchor=CENTER, relx=0.9, rely=0.4)
+
 
     # Make the icon an image of a fractal
     icon = PhotoImage(file="Mandelbrot Logo.png")
