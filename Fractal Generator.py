@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import tkinter as tk
-from tkinter import * 
 from tkinter import messagebox
 from tkinter import ttk
 
@@ -13,7 +12,7 @@ def generate_mandelbrot(d=2,height=600, width=800, max_iterations=200,
         The c values are taken from the point of calculation
         The z values are always 0"""
          
-        # Changing the axes centering for different exponent values
+        # Changing the axes tk.CENTERing for different exponent values
         match (d):
             case 2:
                 real_min = -2.0
@@ -293,12 +292,12 @@ class FractalApp(tk.Tk):
                                   fg=self.text_colour,
                                   bg=self.bg_colour
                                   )
-        m_label_d.place(anchor=CENTER, relx=0.872, rely=0.075)
+        m_label_d.place(anchor=tk.CENTER, relx=0.872, rely=0.075)
         m_entry_d = tk.Entry(self.mandelbrot_tab,
                                   font=("Aptos", 13),
                                   fg=self.text_colour
                                   )
-        m_entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
+        m_entry_d.place(anchor=tk.CENTER, relx=0.9, rely=0.1)
         m_entry_d.insert(0, "2")
 
         m_label_max_iterations = tk.Label(self.mandelbrot_tab,
@@ -307,12 +306,12 @@ class FractalApp(tk.Tk):
                                                fg=self.text_colour,
                                                bg=self.bg_colour
                                                )
-        m_label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.125)
+        m_label_max_iterations.place(anchor=tk.CENTER, relx=0.88, rely=0.125)
         m_entry_max_iterations = tk.Entry(self.mandelbrot_tab,
                                                font=("Aptos", 13),
                                                fg=self.text_colour
                                                )
-        m_entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.15)
+        m_entry_max_iterations.place(anchor=tk.CENTER, relx=0.9, rely=0.15)
         m_entry_max_iterations.insert(0, "200")
 
         m_label_resolution_factor = tk.Label(self.mandelbrot_tab,
@@ -321,12 +320,12 @@ class FractalApp(tk.Tk):
                                                   fg=self.text_colour,
                                                   bg=self.bg_colour
                                                   )
-        m_label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.175)
+        m_label_resolution_factor.place(anchor=tk.CENTER, relx=0.888, rely=0.175)
         m_entry_resolution_factor = tk.Entry(self.mandelbrot_tab,
                                                   font=("Aptos", 13),
                                                   fg=self.text_colour
                                                   )
-        m_entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.2)
+        m_entry_resolution_factor.place(anchor=tk.CENTER, relx=0.9, rely=0.2)
         m_entry_resolution_factor.insert(0, "1")
 
         m_label_colour_map = tk.Label(self.mandelbrot_tab,
@@ -335,16 +334,16 @@ class FractalApp(tk.Tk):
                                            fg=self.text_colour,
                                            bg=self.bg_colour
                                            )
-        m_label_colour_map.place(anchor=CENTER, relx=0.875, rely=0.225)
+        m_label_colour_map.place(anchor=tk.CENTER, relx=0.875, rely=0.225)
         m_entry_colour_map = tk.Entry(self.mandelbrot_tab,
                                            font=("Aptos", 13),
                                            fg=self.text_colour
                                            )
-        m_entry_colour_map.place(anchor=CENTER, relx=0.9, rely=0.25)
+        m_entry_colour_map.place(anchor=tk.CENTER, relx=0.9, rely=0.25)
         m_entry_colour_map.insert(0, "magma_r")
 
         # Making suppress checkbox
-        self.m_suppress = BooleanVar()
+        self.m_suppress = tk.BooleanVar()
         m_checkbox = tk.Checkbutton(self.mandelbrot_tab,
                              text="Do not show runtime warnings",
                              variable=self.m_suppress,
@@ -353,7 +352,7 @@ class FractalApp(tk.Tk):
                              bg=self.bg_colour,
                              font=("Aptos", 10)
                              )
-        m_checkbox.place(anchor=CENTER, relx=0.9, rely=0.35)
+        m_checkbox.place(anchor=tk.CENTER, relx=0.9, rely=0.35)
 
         # Update plot function
         def update_mandelbrot_plot():
@@ -403,7 +402,7 @@ class FractalApp(tk.Tk):
                                      fg=self.text_colour,
                                      font=("Aptos", 13, "bold")
                                      )
-        m_generate_button.place(anchor=CENTER, relx=0.9, rely=0.3)
+        m_generate_button.place(anchor=tk.CENTER, relx=0.9, rely=0.3)
 
         # Making a quit button
         m_quit_button = tk.Button(self.mandelbrot_tab,
@@ -413,7 +412,7 @@ class FractalApp(tk.Tk):
                                   fg=self.text_colour,
                                   font=("Aptos", 13, "bold")
                                   )
-        m_quit_button.place(anchor=CENTER, relx=0.9, rely=0.9)
+        m_quit_button.place(anchor=tk.CENTER, relx=0.9, rely=0.9)
 
 
         """Julia Tab Widgets"""
@@ -434,12 +433,12 @@ class FractalApp(tk.Tk):
                              fg=self.text_colour,
                              bg=self.bg_colour
                              )
-        j_label_d.place(anchor=CENTER, relx=0.872, rely=0.075)
+        j_label_d.place(anchor=tk.CENTER, relx=0.872, rely=0.075)
         j_entry_d = tk.Entry(self.julia_tab,
                              font=("Aptos", 13),
                              fg=self.text_colour
                              )
-        j_entry_d.place(anchor=CENTER, relx=0.9, rely=0.1)
+        j_entry_d.place(anchor=tk.CENTER, relx=0.9, rely=0.1)
         j_entry_d.insert(0, "2")
 
         j_label_c = tk.Label(self.julia_tab,
@@ -448,12 +447,12 @@ class FractalApp(tk.Tk):
                              fg=self.text_colour,
                              bg=self.bg_colour
                              )
-        j_label_c.place(anchor=CENTER, relx=0.875, rely=0.125)
+        j_label_c.place(anchor=tk.CENTER, relx=0.875, rely=0.125)
         j_entry_c = tk.Entry(self.julia_tab,
                              font=("Aptos", 13),
                              fg=self.text_colour
                              )
-        j_entry_c.place(anchor=CENTER, relx=0.9, rely=0.15)
+        j_entry_c.place(anchor=tk.CENTER, relx=0.9, rely=0.15)
         j_entry_c.insert(0, "-0.7629,0.1889")
 
         j_label_max_iterations = tk.Label(self.julia_tab,
@@ -462,12 +461,12 @@ class FractalApp(tk.Tk):
                                           fg=self.text_colour,
                                           bg=self.bg_colour
                                           )
-        j_label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.175)
+        j_label_max_iterations.place(anchor=tk.CENTER, relx=0.88, rely=0.175)
         j_entry_max_iterations = tk.Entry(self.julia_tab,
                                           font=("Aptos", 13),
                                           fg=self.text_colour
                                           )
-        j_entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.2)
+        j_entry_max_iterations.place(anchor=tk.CENTER, relx=0.9, rely=0.2)
         j_entry_max_iterations.insert(0, "100")
 
         j_label_resolution_factor = tk.Label(self.julia_tab,
@@ -476,12 +475,12 @@ class FractalApp(tk.Tk):
                                              bg=self.bg_colour,
                                              font=("Aptos", 13, "bold")
                                              )
-        j_label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.225)
+        j_label_resolution_factor.place(anchor=tk.CENTER, relx=0.888, rely=0.225)
         j_entry_resolution_factor = tk.Entry(self.julia_tab,
                                              font=("Aptos", 13),
                                              fg=self.text_colour
                                              )
-        j_entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.25)
+        j_entry_resolution_factor.place(anchor=tk.CENTER, relx=0.9, rely=0.25)
         j_entry_resolution_factor.insert(0, "1")
 
         j_label_colour_map = tk.Label(self.julia_tab,
@@ -490,16 +489,16 @@ class FractalApp(tk.Tk):
                                       fg=self.text_colour,
                                       bg=self.bg_colour
                                       )
-        j_label_colour_map.place(anchor=CENTER, relx=0.875, rely=0.275)
+        j_label_colour_map.place(anchor=tk.CENTER, relx=0.875, rely=0.275)
         j_entry_colour_map = tk.Entry(self.julia_tab,
                                       font=("Aptos", 13),
                                       fg=self.text_colour
                                       )
-        j_entry_colour_map.place(anchor=CENTER, relx=0.9, rely=0.3)
+        j_entry_colour_map.place(anchor=tk.CENTER, relx=0.9, rely=0.3)
         j_entry_colour_map.insert(0, "magma_r")
 
         # Making suppress checkbox
-        self.j_suppress = BooleanVar()
+        self.j_suppress = tk.BooleanVar()
         j_checkbox = tk.Checkbutton(self.julia_tab,
                                     text="Do not show runtime warnings",
                                     variable=self.j_suppress,
@@ -508,7 +507,7 @@ class FractalApp(tk.Tk):
                                     bg=self.bg_colour,
                                     font=("Aptos", 10)
                                     )
-        j_checkbox.place(anchor=CENTER, relx=0.9, rely=0.4)
+        j_checkbox.place(anchor=tk.CENTER, relx=0.9, rely=0.4)
 
         # Update plot function
         def update_julia_plot():
@@ -568,7 +567,7 @@ class FractalApp(tk.Tk):
                                       fg=self.text_colour,
                                       font=("Aptos", 13, "bold")
                                       )
-        j_generate_button.place(anchor=CENTER, relx=0.9, rely=0.35)
+        j_generate_button.place(anchor=tk.CENTER, relx=0.9, rely=0.35)
 
         # Making a quit button
         j_quit_button = tk.Button(self.julia_tab,
@@ -578,7 +577,7 @@ class FractalApp(tk.Tk):
                                   fg=self.text_colour,
                                   font=("Aptos", 13, "bold")
                                   )
-        j_quit_button.place(anchor=CENTER, relx=0.9, rely=0.9)
+        j_quit_button.place(anchor=tk.CENTER, relx=0.9, rely=0.9)
 
 
         """Newton Tab Widgets"""
@@ -599,12 +598,12 @@ class FractalApp(tk.Tk):
                                         fg=self.text_colour,
                                         bg=self.bg_colour
                                         )
-        n_label_coefficients.place(anchor=CENTER, relx=0.875, rely=0.075)
+        n_label_coefficients.place(anchor=tk.CENTER, relx=0.875, rely=0.075)
         n_entry_coefficients = tk.Entry(self.newton_tab,
                                         font=("Aptos", 13),
                                         fg=self.text_colour
                                         )
-        n_entry_coefficients.place(anchor=CENTER, relx=0.9, rely=0.1)
+        n_entry_coefficients.place(anchor=tk.CENTER, relx=0.9, rely=0.1)
         n_entry_coefficients.insert(0, "-1,0,0,1")
 
         n_label_domain = tk.Label(self.newton_tab,
@@ -613,12 +612,12 @@ class FractalApp(tk.Tk):
                                   fg=self.text_colour,
                                   bg=self.bg_colour
                                   )
-        n_label_domain.place(anchor=CENTER, relx=0.867, rely=0.125)
+        n_label_domain.place(anchor=tk.CENTER, relx=0.867, rely=0.125)
         n_entry_domain = tk.Entry(self.newton_tab,
                                   font=("Aptos", 13),
                                   fg=self.text_colour
                                   )
-        n_entry_domain.place(anchor=CENTER, relx=0.9, rely=0.15)
+        n_entry_domain.place(anchor=tk.CENTER, relx=0.9, rely=0.15)
         n_entry_domain.insert(0, "-1.0,1.0")
 
         n_label_a = tk.Label(self.newton_tab,
@@ -627,12 +626,12 @@ class FractalApp(tk.Tk):
                              fg=self.text_colour,
                              bg=self.bg_colour
                              )
-        n_label_a.place(anchor=CENTER, relx=0.877, rely=0.175)
+        n_label_a.place(anchor=tk.CENTER, relx=0.877, rely=0.175)
         n_entry_a = tk.Entry(self.newton_tab,
                              font=("Aptos", 13),
                              fg=self.text_colour
                              )
-        n_entry_a.place(anchor=CENTER, relx=0.9, rely=0.2)
+        n_entry_a.place(anchor=tk.CENTER, relx=0.9, rely=0.2)
         n_entry_a.insert(0, "1")
 
         n_label_tolerance = tk.Label(self.newton_tab,
@@ -641,12 +640,12 @@ class FractalApp(tk.Tk):
                                      fg=self.text_colour,
                                      bg=self.bg_colour
                                      )
-        n_label_tolerance.place(anchor=CENTER, relx=0.871, rely=0.225)
+        n_label_tolerance.place(anchor=tk.CENTER, relx=0.871, rely=0.225)
         n_entry_tolerance = tk.Entry(self.newton_tab,
                                      font=("Aptos", 13),
                                      fg=self.text_colour
                                      )
-        n_entry_tolerance.place(anchor=CENTER, relx=0.9, rely=0.25)
+        n_entry_tolerance.place(anchor=tk.CENTER, relx=0.9, rely=0.25)
         n_entry_tolerance.insert(0, "1e-6")
 
         n_label_max_iterations = tk.Label(self.newton_tab,
@@ -655,12 +654,12 @@ class FractalApp(tk.Tk):
                                           fg=self.text_colour,
                                           bg=self.bg_colour
                                           )
-        n_label_max_iterations.place(anchor=CENTER, relx=0.88, rely=0.275)
+        n_label_max_iterations.place(anchor=tk.CENTER, relx=0.88, rely=0.275)
         n_entry_max_iterations = tk.Entry(self.newton_tab,
                                           font=("Aptos", 13),
                                           fg=self.text_colour
                                           )
-        n_entry_max_iterations.place(anchor=CENTER, relx=0.9, rely=0.3)
+        n_entry_max_iterations.place(anchor=tk.CENTER, relx=0.9, rely=0.3)
         n_entry_max_iterations.insert(0, "100")
 
         n_label_resolution_factor = tk.Label(self.newton_tab,
@@ -669,12 +668,12 @@ class FractalApp(tk.Tk):
                                              fg=self.text_colour,
                                              bg=self.bg_colour
                                              )
-        n_label_resolution_factor.place(anchor=CENTER, relx=0.888, rely=0.325)
+        n_label_resolution_factor.place(anchor=tk.CENTER, relx=0.888, rely=0.325)
         n_entry_resolution_factor = tk.Entry(self.newton_tab,
                                              font=("Aptos", 13),
                                              fg=self.text_colour
                                              )
-        n_entry_resolution_factor.place(anchor=CENTER, relx=0.9, rely=0.35)
+        n_entry_resolution_factor.place(anchor=tk.CENTER, relx=0.9, rely=0.35)
         n_entry_resolution_factor.insert(0, "1")
 
         n_label_colour_map = tk.Label(self.newton_tab,
@@ -683,16 +682,16 @@ class FractalApp(tk.Tk):
                                       fg=self.text_colour,
                                       bg=self.bg_colour
                                       )
-        n_label_colour_map.place(anchor=CENTER, relx=0.875, rely=0.375)
+        n_label_colour_map.place(anchor=tk.CENTER, relx=0.875, rely=0.375)
         n_entry_colour_map = tk.Entry(self.newton_tab,
                                       font=("Aptos", 13),
                                       fg=self.text_colour
                                       )
-        n_entry_colour_map.place(anchor=CENTER, relx=0.9, rely=0.4)
+        n_entry_colour_map.place(anchor=tk.CENTER, relx=0.9, rely=0.4)
         n_entry_colour_map.insert(0, "magma_r")
 
         # Making suppress checkbox
-        self.n_suppress = BooleanVar()
+        self.n_suppress = tk.BooleanVar()
         n_checkbox = tk.Checkbutton(self.newton_tab,
                                     text="Do not show runtime warnings",
                                     variable=self.n_suppress,
@@ -701,7 +700,7 @@ class FractalApp(tk.Tk):
                                     bg=self.bg_colour,
                                     font=("Aptos", 10)
                                     )
-        n_checkbox.place(anchor=CENTER, relx=0.9, rely=0.5)
+        n_checkbox.place(anchor=tk.CENTER, relx=0.9, rely=0.5)
 
         # Update plot function
         def update_newton_plot():
@@ -765,7 +764,7 @@ class FractalApp(tk.Tk):
                                       fg=self.text_colour,
                                       font=("Aptos", 13, "bold")
                                       )
-        n_generate_button.place(anchor=CENTER, relx=0.9, rely=0.45)
+        n_generate_button.place(anchor=tk.CENTER, relx=0.9, rely=0.45)
 
         # Making a quit button
         n_quit_button = tk.Button(self.newton_tab,
@@ -775,7 +774,44 @@ class FractalApp(tk.Tk):
                                   fg=self.text_colour,
                                   font=("Aptos", 13, "bold")
                                   )
-        n_quit_button.place(anchor=CENTER, relx=0.9, rely=0.9)
+        n_quit_button.place(anchor=tk.CENTER, relx=0.9, rely=0.9)
+
+
+        """Info Tab Widgets"""
+        # Making canvas and scrollbar to make tab scrollable
+        info_canvas = tk.Canvas(self.info_tab,
+                                bg=self.bg_colour
+                                )
+        info_canvas.pack(side="left",
+                         fill=tk.BOTH,
+                         expand=1
+                         )
+        info_scrollbar = ttk.Scrollbar(self.info_tab,
+                                       orient=tk.VERTICAL,
+                                       command=info_canvas.yview,
+                                       )
+        info_scrollbar.pack(side="right", fill=tk.Y)
+        info_canvas.configure(yscrollcommand=info_scrollbar.set)
+        info_canvas.bind("<Configure>", lambda e: info_canvas.configure(scrollregion=info_canvas.bbox("all")))
+        scrollable_frame = tk.Frame(info_canvas,
+                                    bg=self.bg_colour
+                                    )
+        info_canvas.create_window((0,0), window=scrollable_frame, anchor="nw")
+        
+        title = tk.Label(scrollable_frame,
+                         text="What are Fractals?",
+                         font=("Aptos", 30, "bold"),
+                         fg=self.text_colour,
+                         bg=self.bg_colour
+                         ).grid(row=0,
+                                column=0)
+        title_info = tk.Label(scrollable_frame,
+                              text="""Fractals""",
+                              font=("Aptos", 14),
+                              fg=self.text_colour,
+                              bg=self.bg_colour
+                              ).grid(row=1,
+                                     column=0)
 
 
 def main():
