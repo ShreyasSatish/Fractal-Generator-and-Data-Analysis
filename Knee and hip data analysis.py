@@ -282,7 +282,7 @@ Number: {insertion_to_symptom_stats[-1]}
     
         print(f"""Time in months between Prosthesis Insertion to Scan occurence - {self.identifier}:
 Mean: {round(insertion_to_scan_stats[0], 2)}
-Median: {round(insertion_to_scan_stats[1]), 2}
+Median: {round(insertion_to_scan_stats[1], 2)}
 Mode: {insertion_to_scan_stats[2][0]}
 Standard Deviation: {round(insertion_to_scan_stats[3], 2)}
 Maximum: {round(insertion_to_scan_stats[4], 2)}
@@ -337,6 +337,45 @@ Total: {number}""")
 
         return [positive_count, positive_percentage, negative_count, negative_percentage, undetermined_count, undetermined_percentage, positive_to_negative_ratio, positive_to_undetermined_ratio, number]
 
+    def outcomes_plot(self, columns=["Negative Scan Result", "Positive Scan Result"]):
+        self.outcome_data = self.data[["Negative Scan Result", "Positive Scan Result"]]
+
+        n_cols = 2
+        n_rows = 1
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(10, 7))
+        axes = axes.flatten()
+        palettes = ["viridis", "plasma", "magma", "cividis"]
+
+        for i, column in enumerate(columns):
+            if column in self.outcome_data.columns:
+                sns.countplot(
+                    x=column,
+                    data=self.outcome_data,
+                    ax=axes[i],
+                    palette=palettes[i % len(palettes)],
+                    order=self.outcome_data[column].value_counts().index,
+                    hue=column,
+                    legend=False
+                )
+
+                axes[i].set_title(f"Actions taken after a {column} - {self.identifier}", fontsize=14)
+                axes[i].set_xlabel("Action", fontsize=12)
+                axes[i].set_ylabel("Number of Patients", fontsize=12)
+                axes[i].tick_params(axis="x", rotation=45, labelsize=10, labelright=False)
+                plt.setp(axes[i].get_xticklabels(), ha="right", rotation_mode="anchor")
+            
+            else:
+                print(f"Warning: Column {column} not found in DataFrame")
+
+        for j in range(i + 1, len(axes)):
+            fig.delaxes(axes[j])
+
+        plt.figure(1)
+        plt.tight_layout(pad=3.0)
+        manager = plt.get_current_fig_manager()
+        manager.window.state("zoomed")
+        plt.show()        
+
 
 def plot_demographics(df):
     fig2, ax2 = plt.subplots()
@@ -373,16 +412,18 @@ def main():
     knees.scan_stats()
     knees.times_between()
     knees.infection_stats()
+    knees.outcomes_plot()
 
-    hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
-    hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery"])
-    hips.age_stats()
-    hips.bmi_stats()
-    hips.gender_stats()
-    hips.comorbidity_stats()
-    hips.scan_stats()
-    hips.times_between()
-    hips.infection_stats()
+    # hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
+    # hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery"])
+    # hips.age_stats()
+    # hips.bmi_stats()
+    # hips.gender_stats()
+    # hips.comorbidity_stats()
+    # hips.scan_stats()
+    # hips.times_between()
+    # hips.infection_stats()
+    # hips.outcomes_plot()
 
 if __name__ == "__main__":
     main()
