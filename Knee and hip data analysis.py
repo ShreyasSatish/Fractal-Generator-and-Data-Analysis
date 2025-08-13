@@ -123,18 +123,23 @@ Total: {total}
             plot_data = []
             self.comorbidity_type = self.data["Type of Comorbidity"]
             for entry in self.comorbidity_type:
-                if "," in str(entry):
-                    split = entry.split(",")
-                    for condition in split:
-                        plot_data.append(condition)
+                if isinstance(entry, str) and "," in entry:
+                    split_entries = entry.split(",")
+                    for condition in split_entries:
+                        plot_data.append(condition.strip())
+                elif isinstance(entry, str):
+                    plot_data.append(entry.strip())
+
+            comorbidity_counts = pd.Series(plot_data).value_counts()
             fig, ax = plt.subplots()
-            sns.countplot(x=plot_data, palette="viridis")
+            sns.barplot(x=comorbidity_counts.index, y=comorbidity_counts.values, palette="viridis")
             ax.tick_params(axis="x", rotation=20, labelsize=10, labelright=False)
             ax.set_xlabel("Type of Comorbidity")
             ax.set_ylabel("Number of Occurences")
             ax.set_title(f"Occurences of different Comorbidities - {self.identifier}")
             manager = plt.get_current_fig_manager()
             manager.window.state("zoomed")
+            plt.tight_layout()
             plt.show()
 
         return [yes_count, yes_percentage, no_count, no_percentage, n_to_y_ratio, total]
@@ -414,16 +419,16 @@ def main():
     knees.infection_stats()
     knees.outcomes_plot()
 
-    # hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
-    # hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery"])
-    # hips.age_stats()
-    # hips.bmi_stats()
-    # hips.gender_stats()
-    # hips.comorbidity_stats()
-    # hips.scan_stats()
-    # hips.times_between()
-    # hips.infection_stats()
-    # hips.outcomes_plot()
+    hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
+    hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery"])
+    hips.age_stats()
+    hips.bmi_stats()
+    hips.gender_stats()
+    hips.comorbidity_stats()
+    hips.scan_stats()
+    hips.times_between()
+    hips.infection_stats()
+    hips.outcomes_plot()
 
 if __name__ == "__main__":
     main()
