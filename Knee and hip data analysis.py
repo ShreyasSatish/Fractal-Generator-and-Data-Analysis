@@ -9,8 +9,8 @@ class ProcessData:
     def __init__(self, filepath=None, category=None, column=None):
         if category==None or column==None:
             try:
-                print("in if statement")
                 self.data = pd.read_csv(filepath)
+                self.identifier = "All"
             except FileNotFoundError:
                 print("File not found")
                 self.data = None
@@ -381,6 +381,33 @@ Total: {number}""")
         manager.window.state("zoomed")
         plt.show()        
 
+    def surgery_plot(self):
+        self.positive_scans = self.data[self.data["Positive Scan Result"] == "Surgery"]
+        self.negative_scans = self.data[self.data["Negative Scan Result"] == "Offered Surgery"]
+        self.false_positive = len(self.positive_scans[self.positive_scans["Loosening/Infection"] == "Negative"])
+        self.flase_negative = len(self.negative_scans[self.negative_scans["Loosening/Infection"] == "Positive"])
+        self.number_of_surgeries = len(self.data[(self.data["Loosening/Infection"] == "Positive") | (self.data["Loosening/Infection"] == "Negative")]) + 1
+
+        fig, [ax1, ax2] = plt.subplots(nrows=1, ncols=2)
+        sns.countplot(x=self.positive_scans["Surgery Outcome"], ax=ax1)
+        sns.countplot(x=self.negative_scans["Surgery Outcome"], ax=ax2)
+        
+        ax1.tick_params(axis="x", rotation=45)
+        ax1.set_title("Outcome of Surgery for Positive Scans")
+        ax1.set_ylabel("Number of Patients")
+       
+        ax2.tick_params(axis="x", rotation=45)
+        ax2.set_title("Outcome of Surgery for Negative Scans")
+        ax2.set_ylabel("Number of Patients")
+       
+        manager = plt.get_current_fig_manager()
+        manager.window.state("zoomed")
+        plt.tight_layout()
+        plt.show()
+        
+        print(f"Total number of surgeries: {self.number_of_surgeries}")
+        print(f"# of False Positives: {self.false_positive}")
+        print(f"# of False Negatives: {self.flase_negative}")   
 
 def plot_demographics(df):
     fig2, ax2 = plt.subplots()
@@ -408,27 +435,32 @@ def plot_demographics(df):
 
 def main():
 
-    knees = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="K")
-    knees.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery"])
-    knees.age_stats()
-    knees.bmi_stats()
-    knees.gender_stats()
-    knees.comorbidity_stats()
-    knees.scan_stats()
-    knees.times_between()
-    knees.infection_stats()
-    knees.outcomes_plot()
+    # knees = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="K")
+    # knees.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    # knees.age_stats()
+    # knees.bmi_stats()
+    # knees.gender_stats()
+    # knees.comorbidity_stats()
+    # knees.scan_stats()
+    # knees.times_between()
+    # knees.infection_stats()
+    # knees.outcomes_plot()
 
-    hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
-    hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery"])
-    hips.age_stats()
-    hips.bmi_stats()
-    hips.gender_stats()
-    hips.comorbidity_stats()
-    hips.scan_stats()
-    hips.times_between()
-    hips.infection_stats()
-    hips.outcomes_plot()
+    # hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
+    # hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    # hips.age_stats()
+    # hips.bmi_stats()
+    # hips.gender_stats()
+    # hips.comorbidity_stats()
+    # hips.scan_stats()
+    # hips.times_between()
+    # hips.infection_stats()
+    # hips.outcomes_plot()
+
+    all = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv")
+    all.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    # all.outcomes_plot()
+    all.surgery_plot()
 
 if __name__ == "__main__":
     main()

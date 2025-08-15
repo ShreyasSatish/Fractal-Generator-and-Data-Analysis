@@ -804,14 +804,16 @@ class FractalApp(tk.Tk):
                          fg=self.text_colour,
                          bg=self.bg_colour
                          ).grid(row=0,
-                                column=0)
+                                column=0,
+                                columnspan=10)
         title_info = tk.Label(scrollable_frame,
                               text="""Fractals""",
                               font=("Aptos", 14),
                               fg=self.text_colour,
                               bg=self.bg_colour
                               ).grid(row=1,
-                                     column=0)
+                                     column=0, 
+                                     columnspan=1)
 
 
 def main():
