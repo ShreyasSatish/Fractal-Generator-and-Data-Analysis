@@ -392,7 +392,6 @@ Total: {number}""")
         self.carried_out_surgeries = len(self.loosening_result) + len(self.infection_result)
         self.num_false_positives = len(self.data[(self.data["Result of bone scan"] == "Positive") & (self.data["Loosening"] == "Negative")])
         self.num_false_negatives = len(self.data[(self.data["Result of bone scan"] == "Negative") & (self.data["Loosening"] == "Positive")])
-        # self.num_true_positives = len(self.data[(self.data["Result of bone scan"] == "Positive") & ((self.data["Loosening"] == "Positive") | self.data["Infection"] == "Positive")])
 
         fig, [ax1, ax2] = plt.subplots(nrows=1, ncols=2)
         sns.countplot(x=self.positive_scans["Surgery Outcome"], ax=ax1)
@@ -412,8 +411,6 @@ Total: {number}""")
         plt.show()
         
         print(f"Total number of surgeries carried out - {self.identifier}: {self.carried_out_surgeries}")
-        # print(f"# of False Positives: {self.false_positive}")
-        # print(f"# of False Negatives: {self.false_negative}") 
         print(f"Number of False Positives - {self.identifier}: {self.num_false_positives}")
         print(f"Number of False Negatives - {self.identifier}: {self.num_false_negatives}")  
 
