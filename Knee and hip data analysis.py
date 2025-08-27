@@ -345,6 +345,8 @@ Total: {number}""")
 
     def outcomes_plot(self, columns=["Negative Scan Result", "Positive Scan Result"]):
         self.outcome_data = self.data[["Negative Scan Result", "Positive Scan Result"]]
+        print(self.data["Positive Scan Result"].count())
+        print(self.data["Negative Scan Result"].count())
 
         n_cols = 2
         n_rows = 1
@@ -385,20 +387,23 @@ Total: {number}""")
     def surgery_plot(self):
         self.positive_scans = self.data[self.data["Positive Scan Result"] == "Surgery"]
         self.negative_scans = self.data[self.data["Negative Scan Result"] == "Offered Surgery"]
-        self.false_positive = len(self.positive_scans[self.positive_scans["Loosening/Infection"] == "Negative"])
-        self.false_negative = len(self.negative_scans[self.negative_scans["Loosening/Infection"] == "Positive"])
-        self.number_of_surgeries = len(self.data[(self.data["Loosening/Infection"] == "Positive") | (self.data["Loosening/Infection"] == "Negative")]) + 1
+        self.loosening_result = self.data[(self.data["Loosening"] == "Positive") | (self.data["Loosening"] == "Negative")]
+        self.infection_result = self.data[(self.data["Infection"] == "Positive") | (self.data["Infection"] == "Negative")]
+        self.carried_out_surgeries = len(self.loosening_result) + len(self.infection_result)
+        self.num_false_positives = len(self.data[(self.data["Result of bone scan"] == "Positive") & (self.data["Loosening"] == "Negative")])
+        self.num_false_negatives = len(self.data[(self.data["Result of bone scan"] == "Negative") & (self.data["Loosening"] == "Positive")])
+        # self.num_true_positives = len(self.data[(self.data["Result of bone scan"] == "Positive") & ((self.data["Loosening"] == "Positive") | self.data["Infection"] == "Positive")])
 
         fig, [ax1, ax2] = plt.subplots(nrows=1, ncols=2)
         sns.countplot(x=self.positive_scans["Surgery Outcome"], ax=ax1)
         sns.countplot(x=self.negative_scans["Surgery Outcome"], ax=ax2)
         
         ax1.tick_params(axis="x", rotation=45)
-        ax1.set_title("Outcome of Surgery for Positive Scans")
+        ax1.set_title(f"Outcome of Surgery for Positive Scans - {self.identifier}")
         ax1.set_ylabel("Number of Patients")
        
         ax2.tick_params(axis="x", rotation=45)
-        ax2.set_title("Outcome of Surgery for Negative Scans")
+        ax2.set_title(f"Outcome of Surgery for Negative Scans - {self.identifier}")
         ax2.set_ylabel("Number of Patients")
        
         manager = plt.get_current_fig_manager()
@@ -406,9 +411,11 @@ Total: {number}""")
         plt.tight_layout()
         plt.show()
         
-        print(f"Total number of surgeries: {self.number_of_surgeries}")
-        print(f"# of False Positives: {self.false_positive}")
-        print(f"# of False Negatives: {self.false_negative}")   
+        print(f"Total number of surgeries carried out - {self.identifier}: {self.carried_out_surgeries}")
+        # print(f"# of False Positives: {self.false_positive}")
+        # print(f"# of False Negatives: {self.false_negative}") 
+        print(f"Number of False Positives - {self.identifier}: {self.num_false_positives}")
+        print(f"Number of False Negatives - {self.identifier}: {self.num_false_negatives}")  
 
 def plot_demographics(df):
     fig2, ax2 = plt.subplots()
@@ -436,29 +443,29 @@ def plot_demographics(df):
 
 def main():
 
-    # knees = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="K")
-    # knees.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
-    # knees.age_stats()
-    # knees.bmi_stats()
-    # knees.gender_stats()
-    # knees.comorbidity_stats()
-    # knees.scan_stats()
-    # knees.times_between()
-    # knees.infection_stats()
-    # knees.outcomes_plot()
-    # knees.surgery_plot
+    knees = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="K")
+    knees.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    knees.age_stats()
+    knees.bmi_stats()
+    knees.gender_stats()
+    knees.comorbidity_stats()
+    knees.scan_stats()
+    knees.times_between()
+    knees.infection_stats()
+    knees.outcomes_plot()
+    knees.surgery_plot()
 
-    hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
-    hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
-    hips.age_stats()
-    hips.bmi_stats()
-    hips.gender_stats()
-    hips.comorbidity_stats()
-    hips.scan_stats()
-    hips.times_between()
-    hips.infection_stats()
-    hips.outcomes_plot()
-    hips.surgery_plot()
+    # hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
+    # hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    # hips.age_stats()
+    # hips.bmi_stats()
+    # hips.gender_stats()
+    # hips.comorbidity_stats()
+    # hips.scan_stats()
+    # hips.times_between()
+    # hips.infection_stats()
+    # hips.outcomes_plot()
+    # hips.surgery_plot()
 
     # all = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv")
     # all.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
