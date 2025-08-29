@@ -38,7 +38,7 @@ class ProcessData:
     def age_stats(self):
         self.age = self.data["Age"]
         
-        mean_age = self.age.mean()
+        mean_age_overall = self.age.mean()
         median_age = self.age.median()
         std_age = self.age.std()
         max_age = self.age.max()
@@ -46,7 +46,7 @@ class ProcessData:
         number = self.age.count()
 
         print(f"""Age - {self.identifier}:
-Mean: {round(mean_age, 2)}
+Mean: {round(mean_age_overall, 2)}
 Median: {round(median_age, 2)}
 Standard Deviation: {round(std_age, 2)}
 Maximum: {max_age}
@@ -54,7 +54,7 @@ Minimum: {min_age}
 Total: {number}
 """)
 
-        return [mean_age, median_age, std_age, max_age, min_age, number]
+        return [mean_age_overall, median_age, std_age, max_age, min_age, number]
     
     def bmi_stats(self):
         self.bmi = self.data["BMI"]
@@ -308,6 +308,292 @@ Number: {symptom_to_scan_stats[-1]}
         
         return insertion_to_scan_stats, insertion_to_symptom_stats, symptom_to_scan_stats
 
+    def times_between_female(self, plot=True):
+        months = {"Jan": 1,
+              "Feb": 2,
+              "Mar": 3,
+              "Apr": 4,
+              "May": 5,
+              "Jun": 6,
+              "Jul": 7,
+              "Aug": 8,
+              "Sep": 9,
+              "Oct": 10,
+              "Nov": 11,
+              "Dec": 12}
+        insertion_to_symptom = []
+        insertion_to_scan = []
+        symptom_to_scan = []
+        self.female = self.data[self.data["Gender"] == "F"]
+        insertion_dates = self.female["Date of prosthesis insertion"]
+        symptom_dates = self.female["Date of symptom onset"]
+        scan_dates = self.female["Date of scan"]
+
+        for i in range(len(insertion_dates)):
+            if "-" in insertion_dates.iloc[i]:
+                insertion_month, insertion_year = insertion_dates.iloc[i].split("-")
+                insertion_month = months[insertion_month]
+                insertion_year = int("20" + insertion_year)
+
+                symptom_month, symptom_year = symptom_dates.iloc[i].split("-")
+                symptom_month = months[symptom_month]
+                symptom_year = int("20" + symptom_year)
+
+                scan_month, scan_year = scan_dates.iloc[i].split("-")
+                scan_month = months[scan_month]
+                scan_year = int("20" + scan_year)
+
+                if (insertion_year > symptom_year) or (insertion_year > scan_year) or (symptom_year > scan_year):
+                    print(f"Error at index {i}")
+
+                else:
+                    # Calculate the time in months between dates
+                    insertion_to_symptom.append((symptom_year - insertion_year) * 12 + abs((symptom_month - insertion_month)))
+                    insertion_to_scan.append((scan_year - insertion_year) * 12 + abs((scan_month - insertion_month)))
+                    symptom_to_scan.append((scan_year - symptom_year) * 12 + abs((scan_month - symptom_month)))
+            
+            else:
+                insertion_year = int(insertion_dates.iloc[i])
+                symptom_year = int(symptom_dates.iloc[i])
+            
+                scan_month, scan_year = scan_dates.iloc[i].split("-")
+                scan_month = months[scan_month]
+                scan_year = "20" + scan_year
+                scan_year = int(scan_year)
+
+                if (insertion_year > symptom_year) or (insertion_year > scan_year) or (symptom_year > scan_year):
+                    print(f"Error at index {i}")
+            
+                else:
+                    # Calculate the time in months between dates
+                    insertion_to_symptom.append((symptom_year - insertion_year) * 12)
+                    insertion_to_scan.append((scan_year - insertion_year) * 12 + (scan_month - months["Jan"]))
+                    symptom_to_scan.append((scan_year - symptom_year) * 12 + (scan_month - months["Jan"]))
+            
+        # Calculate summary statistics
+        insertion_to_symptom_stats = [np.mean(insertion_to_symptom), np.median(insertion_to_symptom),
+                                  stats.mode(insertion_to_symptom), np.std(insertion_to_symptom),
+                                  np.max(insertion_to_symptom), np.min(insertion_to_symptom),
+                                  len(insertion_to_symptom)]
+        insertion_to_scan_stats = [np.mean(insertion_to_scan), np.median(insertion_to_scan),
+                               stats.mode(insertion_to_scan), np.std(insertion_to_scan),
+                               np.max(insertion_to_scan), np.min(insertion_to_scan),
+                               len(insertion_to_scan)]
+        symptom_to_scan_stats = [np.mean(symptom_to_scan), np.median(symptom_to_scan),
+                             stats.mode(symptom_to_scan), np.std(symptom_to_scan),
+                             np.max(symptom_to_scan), np.min(symptom_to_scan),
+                             len(symptom_to_scan)]
+
+        if plot:
+            fig4, [ax1, ax2, ax3] = plt.subplots(ncols=3, figsize=(17,8))
+
+            ax1.hist(insertion_to_symptom, color="b", rwidth=1, bins=np.arange(0, insertion_to_symptom_stats[4]))
+            ax1.set_title(f"Time between Prosthesis insertion to Symptom onset - F - {self.identifier}")
+            ax1.set_xlabel("Time in Months")
+            ax1.set_ylabel("Number of Patients")
+            ax1.axvline(insertion_to_symptom_stats[0], color="r", linestyle="--", linewidth=0.8)
+            # Magic numbers to get text in spots that look nicer
+            ax1.text(insertion_to_symptom_stats[0] - 11, 0.5, "Mean", rotation=90, transform=ax1.get_xaxis_text1_transform(0)[0])
+            ax1.text(insertion_to_symptom_stats[0] + 1, 0.9, round(insertion_to_symptom_stats[0], 2), rotation=90, transform=ax1.get_xaxis_text1_transform(0)[0])
+
+            ax2.hist(insertion_to_scan, color="g", rwidth=1, bins=np.arange(0, insertion_to_scan_stats[4]))
+            ax2.set_title(f"Time between Prosthesis insertion to Scan date - F - {self.identifier}")
+            ax2.set_xlabel("Time in Months")
+            ax2.set_ylabel("Number of Patients")
+            ax2.axvline(insertion_to_scan_stats[0], color="r", linestyle="--", linewidth=0.8)
+            # Magic numbers to get text in spots that look nicer
+            ax2.text(insertion_to_scan_stats[0] - 14, 0.5, "Mean", rotation=90, transform=ax2.get_xaxis_text1_transform(0)[0])
+            ax2.text(insertion_to_scan_stats[0] + 1, 0.9, round(insertion_to_scan_stats[0], 2), rotation=90, transform=ax2.get_xaxis_text1_transform(0)[0])
+
+            ax3.hist(symptom_to_scan, color="c", rwidth=1, bins=np.arange(0, symptom_to_scan_stats[4]))
+            ax3.set_title(f"Time between Symptom onset to Scan date - F - {self.identifier}")
+            ax3.set_xlabel("Time in Months")
+            ax3.set_ylabel("Number of Patients")
+            ax3.axvline(symptom_to_scan_stats[0], color="r", linestyle="--", linewidth=0.8)
+            # Magic numbers to get text in spots that look nicer
+            ax3.text(symptom_to_scan_stats[0] - 9, 0.5, "Mean", rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
+            ax3.text(symptom_to_scan_stats[0] + 1, 0.9, round(symptom_to_scan_stats[0], 2), rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
+
+            manager = plt.get_current_fig_manager()
+            manager.window.state("zoomed")
+            plt.show()
+
+        # Displaying the statistics in a nicer format
+        print(f"""Time in months between Prosthesis Insertion and Symptom onset - F - {self.identifier}:
+Mean: {round(insertion_to_symptom_stats[0], 2)}
+Median: {round(insertion_to_symptom_stats[1], 2)}
+Mode: {insertion_to_symptom_stats[2][0]}
+Standard Deviation: {round(insertion_to_symptom_stats[3], 2)}
+Maximum: {round(insertion_to_symptom_stats[4], 2)}
+Minimum: {round(insertion_to_symptom_stats[5], 2)}
+Number: {insertion_to_symptom_stats[-1]}
+""")
+    
+        print(f"""Time in months between Prosthesis Insertion to Scan occurence - F - {self.identifier}:
+Mean: {round(insertion_to_scan_stats[0], 2)}
+Median: {round(insertion_to_scan_stats[1], 2)}
+Mode: {insertion_to_scan_stats[2][0]}
+Standard Deviation: {round(insertion_to_scan_stats[3], 2)}
+Maximum: {round(insertion_to_scan_stats[4], 2)}
+Minimum: {round(insertion_to_scan_stats[5], 2)}
+Number: {insertion_to_scan_stats[-1]}
+""")
+    
+        print(f"""Time in months between Symptom onset and Scan date - F - {self.identifier}:
+Mean: {round(symptom_to_scan_stats[0], 2)}
+Median: {round(symptom_to_scan_stats[1], 2)}
+Mode: {symptom_to_scan_stats[2][0]}
+Standard Deviation: {round(symptom_to_scan_stats[3], 2)}
+Maximum: {round(symptom_to_scan_stats[4], 2)}
+Minimum: {round(symptom_to_scan_stats[5], 2)}
+Number: {symptom_to_scan_stats[-1]}
+""")
+        
+        return insertion_to_scan_stats, insertion_to_symptom_stats, symptom_to_scan_stats
+
+    def times_between_male(self, plot=True):
+        months = {"Jan": 1,
+              "Feb": 2,
+              "Mar": 3,
+              "Apr": 4,
+              "May": 5,
+              "Jun": 6,
+              "Jul": 7,
+              "Aug": 8,
+              "Sep": 9,
+              "Oct": 10,
+              "Nov": 11,
+              "Dec": 12}
+        insertion_to_symptom = []
+        insertion_to_scan = []
+        symptom_to_scan = []
+        self.male = self.data[self.data["Gender"] == "M"]
+        insertion_dates = self.male["Date of prosthesis insertion"]
+        symptom_dates = self.male["Date of symptom onset"]
+        scan_dates = self.male["Date of scan"]
+
+        for i in range(len(insertion_dates)):
+            if "-" in insertion_dates.iloc[i]:
+                insertion_month, insertion_year = insertion_dates.iloc[i].split("-")
+                insertion_month = months[insertion_month]
+                insertion_year = int("20" + insertion_year)
+
+                symptom_month, symptom_year = symptom_dates.iloc[i].split("-")
+                symptom_month = months[symptom_month]
+                symptom_year = int("20" + symptom_year)
+
+                scan_month, scan_year = scan_dates.iloc[i].split("-")
+                scan_month = months[scan_month]
+                scan_year = int("20" + scan_year)
+
+                if (insertion_year > symptom_year) or (insertion_year > scan_year) or (symptom_year > scan_year):
+                    print(f"Error at index {i}")
+
+                else:
+                    # Calculate the time in months between dates
+                    insertion_to_symptom.append((symptom_year - insertion_year) * 12 + abs((symptom_month - insertion_month)))
+                    insertion_to_scan.append((scan_year - insertion_year) * 12 + abs((scan_month - insertion_month)))
+                    symptom_to_scan.append((scan_year - symptom_year) * 12 + abs((scan_month - symptom_month)))
+            
+            else:
+                insertion_year = int(insertion_dates.iloc[i])
+                symptom_year = int(symptom_dates.iloc[i])
+            
+                scan_month, scan_year = scan_dates.iloc[i].split("-")
+                scan_month = months[scan_month]
+                scan_year = "20" + scan_year
+                scan_year = int(scan_year)
+
+                if (insertion_year > symptom_year) or (insertion_year > scan_year) or (symptom_year > scan_year):
+                    print(f"Error at index {i}")
+            
+                else:
+                    # Calculate the time in months between dates
+                    insertion_to_symptom.append((symptom_year - insertion_year) * 12)
+                    insertion_to_scan.append((scan_year - insertion_year) * 12 + (scan_month - months["Jan"]))
+                    symptom_to_scan.append((scan_year - symptom_year) * 12 + (scan_month - months["Jan"]))
+            
+        # Calculate summary statistics
+        insertion_to_symptom_stats = [np.mean(insertion_to_symptom), np.median(insertion_to_symptom),
+                                  stats.mode(insertion_to_symptom), np.std(insertion_to_symptom),
+                                  np.max(insertion_to_symptom), np.min(insertion_to_symptom),
+                                  len(insertion_to_symptom)]
+        insertion_to_scan_stats = [np.mean(insertion_to_scan), np.median(insertion_to_scan),
+                               stats.mode(insertion_to_scan), np.std(insertion_to_scan),
+                               np.max(insertion_to_scan), np.min(insertion_to_scan),
+                               len(insertion_to_scan)]
+        symptom_to_scan_stats = [np.mean(symptom_to_scan), np.median(symptom_to_scan),
+                             stats.mode(symptom_to_scan), np.std(symptom_to_scan),
+                             np.max(symptom_to_scan), np.min(symptom_to_scan),
+                             len(symptom_to_scan)]
+
+        if plot:
+            fig4, [ax1, ax2, ax3] = plt.subplots(ncols=3, figsize=(17,8))
+
+            ax1.hist(insertion_to_symptom, color="b", rwidth=1, bins=np.arange(0, insertion_to_symptom_stats[4]))
+            ax1.set_title(f"Time between Prosthesis insertion to Symptom onset - M - {self.identifier}")
+            ax1.set_xlabel("Time in Months")
+            ax1.set_ylabel("Number of Patients")
+            ax1.axvline(insertion_to_symptom_stats[0], color="r", linestyle="--", linewidth=0.8)
+            # Magic numbers to get text in spots that look nicer
+            ax1.text(insertion_to_symptom_stats[0] - 11, 0.5, "Mean", rotation=90, transform=ax1.get_xaxis_text1_transform(0)[0])
+            ax1.text(insertion_to_symptom_stats[0] + 1, 0.9, round(insertion_to_symptom_stats[0], 2), rotation=90, transform=ax1.get_xaxis_text1_transform(0)[0])
+
+            ax2.hist(insertion_to_scan, color="g", rwidth=1, bins=np.arange(0, insertion_to_scan_stats[4]))
+            ax2.set_title(f"Time between Prosthesis insertion to Scan date - M - {self.identifier}")
+            ax2.set_xlabel("Time in Months")
+            ax2.set_ylabel("Number of Patients")
+            ax2.axvline(insertion_to_scan_stats[0], color="r", linestyle="--", linewidth=0.8)
+            # Magic numbers to get text in spots that look nicer
+            ax2.text(insertion_to_scan_stats[0] - 14, 0.5, "Mean", rotation=90, transform=ax2.get_xaxis_text1_transform(0)[0])
+            ax2.text(insertion_to_scan_stats[0] + 1, 0.9, round(insertion_to_scan_stats[0], 2), rotation=90, transform=ax2.get_xaxis_text1_transform(0)[0])
+
+            ax3.hist(symptom_to_scan, color="c", rwidth=1, bins=np.arange(0, symptom_to_scan_stats[4]))
+            ax3.set_title(f"Time between Symptom onset to Scan date - M - {self.identifier}")
+            ax3.set_xlabel("Time in Months")
+            ax3.set_ylabel("Number of Patients")
+            ax3.axvline(symptom_to_scan_stats[0], color="r", linestyle="--", linewidth=0.8)
+            # Magic numbers to get text in spots that look nicer
+            ax3.text(symptom_to_scan_stats[0] - 9, 0.5, "Mean", rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
+            ax3.text(symptom_to_scan_stats[0] + 1, 0.9, round(symptom_to_scan_stats[0], 2), rotation=90, transform=ax3.get_xaxis_text1_transform(0)[0])
+
+            manager = plt.get_current_fig_manager()
+            manager.window.state("zoomed")
+            plt.show()
+
+        # Displaying the statistics in a nicer format
+        print(f"""Time in months between Prosthesis Insertion and Symptom onset - M - {self.identifier}:
+Mean: {round(insertion_to_symptom_stats[0], 2)}
+Median: {round(insertion_to_symptom_stats[1], 2)}
+Mode: {insertion_to_symptom_stats[2][0]}
+Standard Deviation: {round(insertion_to_symptom_stats[3], 2)}
+Maximum: {round(insertion_to_symptom_stats[4], 2)}
+Minimum: {round(insertion_to_symptom_stats[5], 2)}
+Number: {insertion_to_symptom_stats[-1]}
+""")
+    
+        print(f"""Time in months between Prosthesis Insertion to Scan occurence - M - {self.identifier}:
+Mean: {round(insertion_to_scan_stats[0], 2)}
+Median: {round(insertion_to_scan_stats[1], 2)}
+Mode: {insertion_to_scan_stats[2][0]}
+Standard Deviation: {round(insertion_to_scan_stats[3], 2)}
+Maximum: {round(insertion_to_scan_stats[4], 2)}
+Minimum: {round(insertion_to_scan_stats[5], 2)}
+Number: {insertion_to_scan_stats[-1]}
+""")
+    
+        print(f"""Time in months between Symptom onset and Scan date - M - {self.identifier}:
+Mean: {round(symptom_to_scan_stats[0], 2)}
+Median: {round(symptom_to_scan_stats[1], 2)}
+Mode: {symptom_to_scan_stats[2][0]}
+Standard Deviation: {round(symptom_to_scan_stats[3], 2)}
+Maximum: {round(symptom_to_scan_stats[4], 2)}
+Minimum: {round(symptom_to_scan_stats[5], 2)}
+Number: {symptom_to_scan_stats[-1]}
+""")
+        
+        return insertion_to_scan_stats, insertion_to_symptom_stats, symptom_to_scan_stats
+
     def infection_stats(self, plot=True):
         self.infection = self.data[self.data["Aspiration Result"] != np.nan]
         
@@ -345,8 +631,8 @@ Total: {number}""")
 
     def outcomes_plot(self, columns=["Negative Scan Result", "Positive Scan Result"]):
         self.outcome_data = self.data[["Negative Scan Result", "Positive Scan Result"]]
-        print(self.data["Positive Scan Result"].count())
-        print(self.data["Negative Scan Result"].count())
+        # print(self.data["Positive Scan Result"].count())
+        # print(self.data["Negative Scan Result"].count())
 
         n_cols = 2
         n_rows = 1
@@ -440,17 +726,19 @@ def plot_demographics(df):
 
 def main():
 
-    knees = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="K")
-    knees.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
-    knees.age_stats()
-    knees.bmi_stats()
-    knees.gender_stats()
-    knees.comorbidity_stats()
-    knees.scan_stats()
-    knees.times_between()
-    knees.infection_stats()
-    knees.outcomes_plot()
-    knees.surgery_plot()
+    # knees = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="K")
+    # knees.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    # knees.age_stats()
+    # knees.bmi_stats()
+    # knees.gender_stats()
+    # knees.comorbidity_stats()
+    # knees.scan_stats()
+    # knees.times_between()
+    # knees.times_between_female()
+    # knees.times_between_male()
+    # knees.infection_stats()
+    # knees.outcomes_plot()
+    # knees.surgery_plot()
 
     # hips = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv", column="Prosthesis Location", category="H")
     # hips.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
@@ -460,14 +748,20 @@ def main():
     # hips.comorbidity_stats()
     # hips.scan_stats()
     # hips.times_between()
-    # hips.infection_stats()
+    # hips.times_between_female()
+    # hips.times_between_male()
+    # # hips.infection_stats()
     # hips.outcomes_plot()
     # hips.surgery_plot()
 
-    # all = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv")
-    # all.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
+    all = ProcessData(filepath="C:/Users/satis/OneDrive/Desktop/Barts Project/Knee and hip data.csv")
+    all.clean_data(columns=["BMI", "Negative Scan Result", "Positive Scan Result", "Aspiration Result", "Type of Comorbidity", "Surgery Outcome", "Loosening/Infection"])
     # all.outcomes_plot()
     # all.surgery_plot()
+    # all.times_between()
+    all.times_between_female()
+    all.times_between_male()
+    all.comorbidity_stats()
 
 if __name__ == "__main__":
     main()
